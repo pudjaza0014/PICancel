@@ -1,0 +1,36 @@
+﻿<div class="container">
+    <div class="row">
+        <div class=" col-lg-2 form-inline">
+            <div class="form-group p-4">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="Lot" checked>
+                <label for="txtLotNo" class="font-weight-bold">LotNo. : </label>
+            </div>
+        </div>
+        <div class=" col-lg-2 form-inline">
+            @Html.TextBox("txtUndoLotNo", "", new { @class = "form-control form-control-sm UndoControl", @id = "txtUndoLotNo", @placeholder = "LotNo" })
+        </div>
+    </div>
+    <div class="row">
+        <div class=" col-lg-2 form-inline">
+            <div class="form-group p-4">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="Order"  >
+                <label for="txtUndoOrderNo" class="font-weight-bold">OrderNo. : </label>
+            </div>
+        </div>
+        <div class=" col-lg-2 form-inline">
+            @Html.TextBox("txtUndoOrderNo", "", new { @class = "form-control form-control-sm UndoControl", @id = "txtUndoOrderNo", @placeholder = "OrderNo" })
+        </div>
+    </div> 
+</div>
+<hr />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg table-responsive "> 
+            <div id="myTable"></div>
+            <div class="text-center">
+                <button class="btn btn-info btn-lg" id="btnUndo" disabled><i class="fas fa-undo"></i> OK</button>
+                <button class="btn btn-secondary btn-lg" id="btnRefresh" onclick="myFunction()"><i class="fas fa-sync"></i> Clear</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,163 @@
+﻿<div class="container-fluid">
+    <div>
+        <div class="row mt-4  ">
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label for="ddlType" class="font-weight-bold">Type.</label>
+                    @Html.DropDownList("ddlType", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlType", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label for="txtOrder" class="font-weight-bold">Order.</label>
+                    @Html.TextBox("txtOrder", "", new { @class = "form-control form-control-sm ", @id = "txtOrder", @placeholder = "LotNo" })
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2" id="divLink">
+            <div class="col-lg-auto">
+                <div class="form-group text-sm">
+                    <label for="btnLink" class="font-weight-bold">Link To.</label>
+                    <button id="btnLink" class=" btn btn-link"><span>PDF File</span></button>
+                </div>
+                <ul id="files"></ul>
+            </div>
+        </div>
+        <div class="row  ">
+            <div class=" col-lg">
+                <div class="form-group">
+                    <buton class="btn btn-info " style="min-width:10vw" id="btnSearch"><i class="fas fa-search"></i> Search</buton>
+                    <buton class="btn btn-secondary" id="btnClear"><i class="fas fa-sync"></i> Clear</buton>
+                </div>
+                <hr />
+                <div id="divDocNo" style="display:none;">
+                    <div class="form-inline">
+                        <div class="form-group mb-2">
+                            <label for="staticEmail2" class="small font-weight-bold">DOCNo.</label>
+                        </div>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <div class="input-group ">
+                                <div class="input-group-prepend">
+                                    @*<span class="input-group-text" id="basic-addon3"> </span>*@
+                                    <input type="text" class="form-control input-group-text" id="txtDocNo1" aria-describedby="basic-addon3" readonly />
+                                </div>
+                                <input type="text" class="form-control" id="txtDocNo2" aria-describedby="txtDocNo1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @{
+            if (@ViewBag.Event == "OrderError")
+            {
+                Html.RenderPartial("_partialRohm/_PartTableOrderError");
+            }
+            else if (@ViewBag.Event == "NoChip")
+            {
+                Html.RenderPartial("_partialRohm/_PartTableOrderNoChip");
+            }
+        }
+    </div>
+</div>
+
+ 
+
+
+
+<script>
+
+    function GetCancelOperator() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetNOChipErrorgrp", "Rohm")',
+            data: { _WKstatus: "@ViewBag.Event" },
+            dataType: 'json',
+            success: function (citys) {
+                if (citys.length != 0) {
+                    $.each(citys, function (i, city) {
+                        $("#ddlType").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                    });
+                }
+            },
+            error: function (ex) {
+                alert('Failed to retrieve states.' + ex);
+            }
+        });
+
+        $("#btnLink").on("click", function () { 
+           
+            var thePath = "rthsrvvm/No-chip/";
+            var isChrome = !!window.chrome;
+
+            if (isChrome === true) {
+                window.open('file:///' + thePath, '_blank');
+            } else {
+                window.open('file://' + thePath, 'explorer');
+            }
+
+        });
+
+        $("#btnSearch").on("click", function () {
+            if ($("#ddlType").val() == "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Please Choose TYPE.",
+                    type: 'warning',
+                });
+                return false;
+            };
+            dataArry = [{
+                Type: $("#ddlType").val(),
+                OrderNo: $("#txtOrder").val()
+            }];
+            GetDatatoTable(dataArry);
+            $("#divDocNo").css("display", "inline-block") 
+
+        });
+
+        
+    }
+
+    function GetDatatoTable(dataArry) {
+        $.ajax({
+            type: 'POST',
+                url: '@Url.Action("GetDataListNoChip", "Rohm")',
+            data: { dataArr: dataArry[0],_WKstatus: "@ViewBag.Event" },
+            dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+                        DrawDatatoTable(Data);
+                        $("#txtDocNo1").val(Data.DocNo);
+                        $("#txtDocNo2").val(Data.RunNo);
+                    }
+                        else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+
+                                return false;
+                            }
+                            else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                });
+                                $("#txtDocNo1").val("")
+                                $("#txtDocNo2").val("")
+                            }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+    }
+</script>

@@ -1,0 +1,214 @@
+﻿<style>
+     .hideInput{
+         display:none;
+     }
+
+</style>
+
+<div class="container-fluid  ">
+    @* @Html.TextBox("LotNo", "", new { @class = "form-control" })*@
+    <div class=" ">
+        <div class="row ">
+            <div class="col-lg">
+                <div class="form-group" id="divLotno">
+                    <label for="txtLotNo" class="font-weight-bold">LotNo</label>
+                    @Html.TextBox("txtLotNo", "", new { @class = "form-control form-control-sm IpCancels", @id = "txtLotNo", @placeholder = "LotNo", @title = "Tooltip on top" , aria_describedby = "emailHelp" })
+                    <small id="emailHelp" class="form-text text-muted">Input lotno And press Key <kbd>Enter</kbd></small>
+                 
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group hideInput">
+                    <label for="txtpackUnit" class="font-weight-bold">OrderNo.</label>
+                    @Html.TextBox("txtpackUnit", "", new { @class = "form-control form-control-sm   ", @id = "txtpackUnit", @placeholder = "packUnit", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group hideInput">
+                    <label for="txtProductCateg" class="font-weight-bold">InputDate.</label>
+                    @Html.TextBox("txtProductCateg", "", new { @class = "form-control form-control-sm  ", @id = "txtProductCateg", @placeholder = "ProductCateg", @disabled = "disabled" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtOrderNo" class="font-weight-bold">OrderNo.</label>
+                    @Html.TextBox("txtOrderNo", "", new { @class = "form-control form-control-sm IpCancels", @id = "txtOrderNo", @placeholder = "OrderNo", @disabled = "disabled", aria_describedby = "emailHelp1" })
+                    <small id="emailHelp1" class="form-text text-muted" style="display:none;">Input Order And press Key <kbd>Enter</kbd></small>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtInputDate" class="font-weight-bold">InputDate.</label>
+                    @Html.TextBox("txtInputDate", "", new { @class = "form-control form-control-sm ", @id = "txtInputDate", @placeholder = "InputDate", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtOutputDate" class="font-weight-bold">OutputDate.</label>
+                    @Html.TextBox("txtOutputDate", "", new { @class = "form-control form-control-sm ", @id = "txtOutputDate", @placeholder = "OutputDate", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtProductCode" class="font-weight-bold">ProductCode.</label>
+                    @Html.TextBox("txtProductCode", "", new { @class = "form-control form-control-sm ", @id = "txtProductCode", @placeholder = "ProductCode", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtType" class="font-weight-bold">Type.</label>
+                    @Html.TextBox("txtType", "", new { @class = "form-control form-control-sm ", @id = "txtType", @placeholder = "Type", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group" id="divInputQty">
+                    <label for="txtInputQty" class="font-weight-bold">Input Qty.</label>
+                    @Html.TextBox("txtInputQty", "", new { @class = "form-control form-control-sm numbers", @id = "txtInputQty", @placeholder = "Input Qty", @disabled = "disabled" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtOutputQty" id="lblOutputQty" class="font-weight-bold">Output Qty.</label>
+                    @Html.TextBox("txtOutputQty", "", new { @class = "form-control form-control-sm numbers", @id = "txtOutputQty", @placeholder = "Output Qty", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtCancelQty" id="lblCancelQty" class="font-weight-bold">Cancel Qty.</label>
+                    @Html.TextBox("txtCancelQty", "", new { @class = "form-control form-control-sm numbers", @id = "txtCancelQty", @placeholder = "Cancel Qty", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtCompQty" id="lblCompQty" class="font-weight-bold">Complete Qty.</label>
+                    @Html.TextBox("txtCompQty", "", new { @class = "form-control form-control-sm numbers", @id = "txtCompQty", @placeholder = "Complete Qty", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group ">
+                    <label for="txtOriginalQty" class="font-weight-bold form-inline">
+                        Need to Cancel Qty. <small id="passwordHelpBlock" class="form-text text-gray-500"> ( Original Qty - Need to Cancel Qty ) = Remain Qty</small>
+                    </label>
+                    <div class="input-group input-group-sm mb-3">
+                        @Html.TextBox("txtOriginalQty", "", new { @class = "form-control numbers ", @id = "txtOriginalQty", @placeholder = "Original Qty", @aria_describedby = "passwordHelpBlock", @disabled = "disabled" })
+                        <div class="input-group-prepend  ">
+                            <span class="input-group-text   "> - </span>
+                        </div>
+                        @Html.TextBox("txtNeedCancelQty", "", new { @class = "form-control allowNumOnly numbers", @id = "txtNeedCancelQty", @placeholder = "Need to CancelQty", @aria_describedby = "passwordHelpBlock" })
+                        <div class="input-group-prepend  ">
+                            <span class="input-group-text   "> = </span>
+                        </div>
+                        @Html.TextBox("txtRemainQty", "", new { @class = "form-control  numbers", @id = "txtRemainQty", @placeholder = "Remain Qty", @aria_describedby = "passwordHelpBlock", @disabled = "disabled" })
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtOrderNo" class="font-weight-bold">Cancel Code.</label>
+                    @Html.DropDownList("ddlCancelCode", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlCancelCode", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group  border-bottom-info">
+                    <label for="txtInputDate" class="font-weight-bold">Cancel Reason.</label>
+                    @Html.TextBox("txtCancelReason", "", new { @class = "form-control form-control-sm form-control-plaintext  ", @id = "txtCancelReason", @placeholder = "Cancel Reason.", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtOutputDate" class="font-weight-bold">Treatment.</label>
+                    @Html.DropDownList("ddlTreatment", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlTreatment", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg ">
+                <div class="form-group  border-bottom-info">
+                    <label for="txtProductCode" class="font-weight-bold">Treatment Name.</label>
+                    @Html.TextBox("txtTreatmentName", "", new { @class = "form-control form-control-sm form-control-plaintext", @id = "txtTreatmentName", @placeholder = "Treatment Name.", @disabled = "disabled" })
+                </div>
+            </div>
+            <div class="col-lg-4 " style="border:1px solid #cccccc">
+                <div class="p-2">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="txtProductCode" class="font-weight-bold">Responsible.</label>
+                        </div>
+                        <div class="col-3">
+                            <label for="txtProductCode" class="font-weight-bold float-lg-right">Process:</label>
+                        </div>
+                        <div class="col-6">
+                            @Html.TextBox("txtRespProcess", "", new { @class = "form-control form-control-sm ", @id = "txtRespProcess", @placeholder = "Response Process" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="offset-3 col-3">
+                            <label for="txtProductCode" class="font-weight-bold float-lg-right">Machine:</label>
+                        </div>
+                        <div class="col-6">
+                            @Html.TextBox("txtRespMachine", "", new { @class = "form-control form-control-sm ", @id = "txtRespMachine", @placeholder = "Response Machine" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="offset-2 col-4">
+                            <label for="txtProductCode" class="font-weight-bold float-lg-right">Operation Date:</label>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm mb-3">
+                                @Html.TextBox("txtOpeDate", "", new { @class = "form-control form-control-sm datepikers ", @id = "txtOpeDate", @placeholder = "Operation Date." })
+                                <div class="input-group-append  ">
+                                    <button class="input-group-text   "><i class="fas fa-calendar-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg text-center">
+                <div class="" role="alert" id="framelblAlert">
+                    <label class="font-weight-bold" id="lblAlert"></label>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="">
+            <div class="row p-1 ">
+                <div class="col-auto ">
+                    <div class=" ">
+                        <button class="btn btn-info btn-lg" style="width:200px" id="btnAddTemp"><i class="fas fa-plus"></i><span> Add</span></button>
+                    </div>
+                </div>
+                <div class="col-auto ">
+                    <div class="alert  " role="alert">
+                        <a href="#" class="alert-link">Cancel Data</a> Listing all lot in the same order.<span> Lot condition is shown. </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg table-responsive ">
+                <div id="myTable">
+                </div>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="text-center">
+                    <button class="btn btn-primary btn-lg" id="btnCancelEntry"><i class="fas fa-arrow-circle-down"></i> Cancel Entry</button>
+                    <button class="btn btn-secondary btn-lg" id="btnRefresh" onclick=" myFunction()"><i class="fas fa-sync"></i> Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+

@@ -1,0 +1,69 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    if (@ViewBag.Event == "OrderError" || @ViewBag.Event == "NoChip")
+    {
+        Html.RenderPartial("_partialRohm/_PartReturnOrderError");
+    }
+    else if (@ViewBag.Event == "Inquiry")
+    {
+        Html.RenderPartial("_partialRohm/_PartReturnOrderInquiry");
+    }
+
+}
+
+@section Scripts    {
+    <script>
+        var myDataPicker;
+
+         $(document).ready(function (){
+            GetDefault();
+            var strEvent = '@ViewBag.Event';
+            sessionStorage.setItem("ssEvent", strEvent);
+              var strWKstatus = '@ViewBag.WKstatus';
+            sessionStorage.setItem("ssWKstatus", strWKstatus);
+        });
+
+        onReady(function () {
+            $(".se-pre-con").fadeOut("slow");
+            return false;
+        });
+
+        function onReady(callback) {
+            var intervalId = window.setInterval(function () {
+                if (document.getElementsByTagName('body')[0] !== undefined) {
+                    window.clearInterval(intervalId);
+                    callback.call(this);
+                }
+            }, 1000);
+        };
+        function GetDefault() {
+            myDataPicker = $('.datepikers').datepicker({
+                language: 'en',
+                dateFormat: 'dd M yyyy',
+                minView: 'days',
+                view: 'days',
+                maxDate: new Date()
+            }).data('datepicker');
+
+            if ("@ViewBag.Event" != "NoChip") {
+
+                $("#divLink").css("display", "none");
+            } 
+            if ("@ViewBag.Event" != "Inquiry") { 
+                GetCancelOperator();
+            } 
+            GetdataTables();
+        } 
+        $("#btnClear").on("click", function () {
+            myFunction();
+        });
+
+
+
+
+
+
+    </script>
+}

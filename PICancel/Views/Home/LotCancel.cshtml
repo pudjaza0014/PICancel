@@ -1,0 +1,932 @@
+﻿@model PICancel.Models.LotDetail
+
+@{
+    //ViewBag.Title = "LotCancel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="partlotCancel">
+    <div id="MyPartial"></div>
+    @{
+        if (@ViewBag.Event == "CancelInquiry")
+        {
+            Html.RenderPartial("_partial/_PartCancelInquiry");
+        }
+        else if (@ViewBag.Event == "UndoCancel")
+        {
+            Html.RenderPartial("_partial/UndoCancel");
+        }
+        else
+        {
+            Html.RenderPartial("_partial/_PartPIControl");
+        }
+
+    }
+    <a href="@Url.Action("Index")" class="btn btn-link"> <b>&laquo;</b> Back to MainMenu </a>
+</div>
+
+@section Scripts    {
+
+
+<script>
+//Initial
+        var myTables;
+        var myDataPicker;
+
+        $(document).ready(function (){
+            GetDefault();
+            var strEvent = '@ViewBag.Event';
+            sessionStorage.setItem("ssEvent", strEvent);
+              var strWKstatus = '@ViewBag.WKstatus';
+            sessionStorage.setItem("ssWKstatus", strWKstatus);
+            getformatDefault();
+
+
+        });
+        onReady(function () {
+            $(".se-pre-con").fadeOut("slow");
+            return false;
+        });
+        function GetDefault() {
+              var COMPUTERNAME = '@ViewBag.COMPUTERNAME';
+        var USERNAME = '@ViewBag.USERNAME';
+            sessionStorage.setItem("ssUSERNAME", USERNAME);
+            sessionStorage.setItem("ssCOMPUTERNAME", COMPUTERNAME);
+             var strEvent = '@ViewBag.Event';
+            if (strEvent == "CancelInquiry" || strEvent == "UndoCancel") {
+                if (strEvent == "CancelInquiry") {
+                    GetProductCode();
+                    GetCancelCode();
+                    GetLine();
+                    GetType();
+                    GetCancelBy();
+                }
+            }
+            else {
+            GetCancelCode()
+            GetTreatmentCode()
+            }
+            myDataPicker = $('.datepikers').datepicker({
+                language: 'en',
+                dateFormat: 'dd M yyyy',
+                minView: 'days',
+                view: 'days',
+                maxDate: new Date()
+            }).data('datepicker');
+            if ('@ViewBag.Event' != "CancelInquiry" && '@ViewBag.Event' != "UndoCancel")
+            { myDataPicker.selectDate(new Date()); }
+            $("#txtUndoOrderNo").attr('disabled', 'disabled');
+        }
+        function GetCancelCode() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("getCancelCode")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlCancelCode").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+
+        function GetLine() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetLine")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlLine").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+
+        function GetType() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetType")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlType").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+        function GetProductCode() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetProductCode")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlProductCode").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+        function GetCancelBy() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetCancelBy")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlCancel_by").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+
+        function GetTreatmentCode() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetTreatmentCode")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlTreatment").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+        function onReady(callback) {
+            var intervalId = window.setInterval(function () {
+                if (document.getElementsByTagName('body')[0] !== undefined) {
+                    window.clearInterval(intervalId);
+                    callback.call(this);
+                }
+            }, 1000);
+        }
+</script>
+
+    <script>
+        var DataUndos;
+        var strLotNo;
+        var PicancelInquiryControl;
+//Event PICancel
+
+        $(".IpCancels").on('keypress', function (e) {
+            if (e.which == 13) {
+                if (this.value == "") {
+                    return false;
+                }
+                //getdataUndo(this.value, $("input[name='exampleRadios']:checked").val())
+                GetDataDetail(this.value);
+                //strLotNo = this.value;
+            }
+        });
+        $("#btnAddTemp").on("click", function () {
+
+            var text = parseInt($("#txtRemainQty").val().replace(',', ''))
+            
+            var LotCancelDetail = [{
+                LotNo: $("#txtLotNo").val()
+                , OrderNo: $("#txtOrderNo").val()
+                , InputDate: $("#txtInputDate").val()
+                , ProductCateg: $("#txtProductCateg").val()
+                , Packunit: $("#txtpackUnit").val()
+                , OutputDate: $("#txtOutputDate").val()
+                , InputQTY: parseInt($("#txtInputQty").val().replace(',', ''))
+                , OutputQTY: parseInt($("#txtOutputQty").val().replace(',', ''))
+                , CancelQTY: parseInt($("#txtCancelQty").val().replace(',', ''))
+                , CompleteQTY: parseInt($("#txtCompQty").val().replace(',', ''))
+                , Type: $("#txtType").val()
+                , ProductCode: $("#txtProductCode").val()
+                , OriginalQty: parseInt($("#txtOriginalQty").val().replace(',', ''))
+                , NeedCancelQty: parseInt($("#txtNeedCancelQty").val().replace(',', ''))
+                , RemainQty: parseInt($("#txtRemainQty").val().replace(',', ''))
+                , CancelCode: $("#ddlCancelCode").val()
+                , Treatment: $("#ddlTreatment").val()
+                , RespProcess: $("#txtRespProcess").val()
+                , RespMachine: $("#txtRespMachine").val()
+                , OpeDate: $("#txtOpeDate").val()
+            }];
+         $.ajax({
+                    type: 'POST',
+             url: '@Url.Action("TemporaryCondition")',
+             data: { dtTemp: LotCancelDetail[0], strWKstatus : '@ViewBag.WKstatus'},
+                    dataType: 'json',
+             success: function (Data) {
+                 if (Data.strboolbel == true && Data.strResult == "OK")
+                 {
+                     var testcolumn = Object.getOwnPropertyNames(Data.data[0]);
+                     var strCountColumn = testcolumn.length;
+                     var strChartHtml1 = '';
+                     var strChartHtml = '';
+                     for (i = 0; i < strCountColumn; i++) {
+                         strChartHtml1 = strChartHtml1 + '<th></th>'
+                     }
+                     strChartHtml = strChartHtml + ' <table class="table table-sm table-bordered  table-striped nowrap  w-100 " id="myTable4ITEM" style="font-size:small;"><thead class="thead-dark"><tr>' + strChartHtml1;
+                     strChartHtml = strChartHtml + '</tr></thead><tbody></tbody><tfoot><tr>' + strChartHtml1;
+                     strChartHtml = strChartHtml + '</tr> </tfoot></table>'
+                     $("#myTable").html(strChartHtml);
+
+                     var count = '';
+                     for (var c in testcolumn) {
+                         count = count + '{"title":"' + testcolumn[c] + '"  },';
+                     }
+                     statuss = Data.data;
+                     var datas = '';
+                     for (var i in statuss) {
+                         datas = datas + '[';
+                         for (var j in testcolumn) {
+                             datas = datas + '"' + statuss[i][testcolumn[j]] + '",';
+                         }
+                         datas = datas + '],';
+                     }
+                     try {
+                         var dataObject1 = eval('[{"COLUMNS":[ ' + count + ' ],"DATA":[ ' + datas + ' ]}]');
+                         myTables = $('#myTable4ITEM').DataTable({
+                             paging: true,
+                             processing: true,
+                             deferRender: true,
+                             //dom: '<"top"lB>rt<"bottom"ip><"clear">',
+                             dom: '<"top"l>rt<"bottom"ip><"clear">',
+                             buttons: [
+                                 {
+                                     text: '<i class="fa fa-download"></i> Export excel.csv',
+                                     className: '  Button btn btn-success btn-sm',
+                                     action: function (e, dt, node, config) {
+                                         //alert('Activated!');
+                                         //this.disable(); // disable button
+                                         downloadDataDetail4Item();
+                                     }
+                                 }
+                             ],
+                             "data": dataObject1[0].DATA,
+                             "columns": dataObject1[0].COLUMNS,
+                             order: [0, "asc"],
+                             fnInitComplete: function (oSettings, json, sData) {
+                                 $(".se-pre-conF").fadeOut("slow");
+                                 return;
+                             },
+                         });
+                         $("#framelblAlert").addClass("alert alert-success");
+                         initialCtrl();
+                     } catch (e) {
+                         alert(e.message)
+                     }
+                 } else
+                     if (Data.strboolbel == false && Data.strResult == "OK") {
+
+                         $("#framelblAlert").addClass("alert alert-danger");
+                         $("#lblAlert").text(Data.dataLabel);
+                     }
+                     else {
+
+                         Swal.fire({
+                             icon: 'warning',
+                             title: "Warning",
+                             text: Data.dataLabel,
+                             type: 'warning',
+                         })
+
+                     }
+             },
+             error: function (ex) {
+                 alert('Failed to retrieve states.' + ex);
+                    }
+                });
+        });
+        $("#ddlCancelCode").on("change", function () {
+            if($("#ddlCancelCode").val() == ""){
+            $("#txtCancelReason").val("");
+        }else {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("getCancelReason")',
+                    data: { CancelCode: $("#ddlCancelCode").val()},
+                    dataType: 'json',
+                      success: function (citys) {
+                          $("#txtCancelReason").val(citys.data)
+                      },
+                      error: function (ex) {
+                          alert('Failed to retrieve states.' + ex);
+                      }
+                });
+            }
+        });
+        $("#ddlTreatment").on("change", function () {
+            if ($("#ddlTreatment").val() == "") {
+                $("#txtTreatmentName").val("");
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetTreatmentName")',
+                    data: { TreatmentCode: $("#ddlTreatment").val() },
+                    dataType: 'json',
+                    success: function (citys) {
+                        $("#txtTreatmentName").val(citys.data)
+                    },
+                    error: function (ex) {
+                        alert('Failed to retrieve states.' + ex);
+                    }
+                });
+            }
+        });
+        $("#txtNeedCancelQty").on("focusout", function () {
+
+
+            if ($("#txtNeedCancelQty").val() == "" || $("#txtNeedCancelQty").val() == null) {
+                $("#txtNeedCancelQty").val(0);
+                $("#txtNeedCancelQty").css("border", "");
+                $("#txtNeedCancelQty").css("box-shadow", "");
+                return false;
+            } else if (parseInt($("#txtNeedCancelQty").val().replace(',', '')) > parseInt($("#txtOriginalQty").val().replace(',', '')) || parseInt($("#txtNeedCancelQty").val().replace(',', '')) < 0)
+            {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Must be less than CurrentQty in positive",
+                    type: 'warning',
+                })
+                $("#txtNeedCancelQty").css("border", "1px solid red");
+                //$("#txtNeedCancelQty").focus();
+            }else {
+                //$("#txtNeedCancelQty").removeClass("bg-danger text-white");
+                var varRemain = parseInt($("#txtOriginalQty").val().replace(',', '')) - parseInt($("#txtNeedCancelQty").val().replace(',', ''))
+                $("#txtRemainQty").val(formatNumber(varRemain));
+                
+                
+                //$("#txtNeedCancelQty").val(formatNumber(varRemain));
+                $("#txtNeedCancelQty").css("border", "");
+                $("#txtNeedCancelQty").css("box-shadow", "");
+            }
+        });
+        $("#btnCancelEntry").on("click", function () {
+            $("#framelblAlert").removeClass("alert alert-success");
+            $("#framelblAlert").removeClass("alert alert-danger");
+            $("#framelblAlert").addClass("alert alert-primary");
+            $("#lblAlert").text("Data Cancel is processing");
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CancelEntry")',
+                //data: { strLotNo: _Lotno, strWKstatus: strWKstatus },
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: Data.dataLabel,
+                            text: Data.dataLabel,
+                            type: 'success',
+                        }).then(function (result) {
+                            myFunction()
+                        })
+                        $("#framelblAlert").removeClass("alert alert-primary");
+                        $("#lblAlert").text(Data.dataLabel);
+                        $("#framelblAlert").addClass("alert alert-success");
+
+                    } else
+                        if (Data.strboolbel == false && Data.strResult == "OK") {
+                            $("#framelblAlert").addClass("alert alert-danger");
+                            $("#lblAlert").text(Data.dataLabel);
+                        } else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+                                $("#framelblAlert").removeClass("alert alert-primary");
+                                $("#lblAlert").text("");
+                                return false;
+                            }
+                        else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: "Warning",
+                                text: Data.dataLabel,
+                                type: 'warning',
+                            })
+                                $("#framelblAlert").removeClass("alert alert-primary");
+                                $("#lblAlert").text("");
+                        }
+                },
+                error: {
+
+
+
+                }
+            });
+        });
+
+        //Event PICancel
+
+        //Event UNDO
+
+        $("input[name='exampleRadios']").on("click", function () {
+            if (this.value == "Lot") {
+                $("#txtUndoOrderNo").attr('disabled', 'disabled');
+                $("#txtUndoOrderNo").val("");
+                $("#txtUndoLotNo").removeAttr('disabled');
+                $("#txtUndoLotNo").focus();
+
+            } else {
+                $("#txtUndoLotNo").attr('disabled', 'disabled');
+                $("#txtUndoLotNo").val("");
+                $("#txtUndoOrderNo").removeAttr('disabled', 'disabled');
+                $("#txtUndoOrderNo").focus();
+            }
+            $("#framelblAlert").attr('disabled', 'disabled');
+            $("#framelblAlert").attr('disabled', 'disabled');
+
+
+            $(".UndoControl").val("");
+        });
+
+        $(".UndoControl").on('keypress', function (e) {
+            if (e.which == 13) {
+                if (this.value == "") {
+                    return false;
+                }
+                getdataUndo(this.value, $("input[name='exampleRadios']:checked").val())
+                strLotNo = this.value;
+            }
+        });
+
+        $("#btnUndo").on("click", function () {
+            
+            var text = strLotNo;
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetUndoDataEntry")',
+                data: { strLotNo: strLotNo, strWKstatus: $("input[name='exampleRadios']:checked").val(), DataUndo: DataUndos },
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: Data.dataLabel,
+                            text: Data.dataLabel,
+                            type: 'success',
+                        }).then(function (result) {
+                            myFunction()
+                        })
+                        $("#framelblAlert").removeClass("alert alert-primary");
+                        $("#lblAlert").text(Data.dataLabel);
+                        $("#framelblAlert").addClass("alert alert-success");
+
+                    } else
+                        if (Data.strboolbel == false && Data.strResult == "OK") {
+                            $("#framelblAlert").addClass("alert alert-danger");
+                            $("#lblAlert").text(Data.dataLabel);
+                        } else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+                                return false;
+                            }
+                            else {
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                })
+
+                            }
+                },
+                error: {
+
+
+
+                }
+            });
+
+
+        });
+        //Event UNDO
+        //Event inquiry
+
+        $("#btnSearch").on("click", function () {
+            
+            GetDatainquiry();
+
+
+        });
+
+        //Event inquiry
+
+
+
+
+        function GetDataDetail(_Lotno) {
+
+            var strWKstatus = sessionStorage.getItem("ssWKstatus");
+            $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetDataDetail")',
+                data: { strLotNo: _Lotno, strWKstatus: strWKstatus},
+                    dataType: 'json',
+                success: function (citys) {
+
+                    if (citys.strResult =="warning") {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: citys.strResult,
+                            text: citys.dataLabel,
+                            type: 'warning',
+
+                        })
+                    } else
+                          if (citys.strResult != "OK") {
+                              Swal.fire({
+                                  icon: 'error',
+                                  title: citys.strResult,
+                                  text: citys.dataLabel,
+                                  type: 'error',
+
+                              })
+                          } else {
+
+                              $("#lblAlert").text(citys.dataLabel)
+                              dataitems(citys.data);
+                              if (citys.strboolbel == true) {
+                                  $("#framelblAlert").addClass("alert alert-success");
+                                  $("#txtNeedCancelQty").focus();
+                                  //$("#txtNeedCancelQty").click();
+                              } else {
+                                  $("#framelblAlert").addClass("alert alert-danger");
+
+                              }
+
+                          }
+                },
+                error: function (ex) {
+                          alert('Failed to retrieve states.' + ex);
+                }
+            });
+        }
+
+
+
+        function dataitems(items) {
+            $("#txtOrderNo").val(items.OrderNo);
+            $("#txtInputDate").val(convertToJavaScriptDate(items.InputDate));
+            $("#txtOutputDate").val(convertToJavaScriptDate(items.OutputDate));
+            $("#txtProductCode").val(items.ProductCode);
+            $("#txtProductCateg").val(items.ProductCateg);
+            $("#txtpackUnit").val(items.Packunit);
+            $("#txtType").val(items.Type);
+            $("#txtInputQty").val(formatNumber(items.InputQTY));
+            $("#txtOutputQty").val(formatNumber(items.OutputQTY));
+            $("#txtCancelQty").val(formatNumber(items.CancelQTY));
+            $("#txtCompQty").val(formatNumber(items.CompleteQTY));
+            $("#txtOriginalQty").val(formatNumber(items.OriginalQty));
+            $("#txtNeedCancelQty").val(formatNumber(items.NeedCancelQty));
+            $("#txtRemainQty").val(formatNumber(items.RemainQty));
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+        }
+        function convertToJavaScriptDate(value) {
+            var pattern = /Date\(([^)]+)\)/;
+            var results = pattern.exec(value);
+            var dt = new Date(parseFloat(results[1]));
+            return dt.getDate() + " / " + (dt.getMonth() + 1) + " / " + dt.getFullYear();
+        }
+        $(".allowNumOnly").on("keypress keyup blur", function (event) {
+            $(this).val($(this).val().replace(/[^\d].+/, ""));
+            if ((event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
+
+        function initialCtrl() {
+            $("#txtLotNo").val("");
+            $("#txtOrderNo").val("");
+            $("#txtInputDate").val("");
+            $("#txtOutputDate").val("");
+            $("#txtProductCode").val("");
+            $("#txtProductCateg").val("");
+            $("#txtpackUnit").val("");
+            $("#txtType").val("");
+            $("#txtInputQty").val("");
+            $("#txtOutputQty").val("");
+            $("#txtCancelQty").val("");
+            $("#txtCompQty").val("");
+            $("#txtOriginalQty").val("");
+            $("#txtNeedCancelQty").val("");
+            $("#txtRemainQty").val("");
+            $("#ddlCancelCode").val("");
+            $("#txtCancelReason").val("");
+            $("#ddlTreatment").val("");
+            $("#txtTreatmentName").val("");
+        }
+
+
+
+        function getdataUndo(LotNo, Categ) {
+
+
+            $.ajax({
+                    type: 'POST',
+             url: '@Url.Action("GetUndoData")',
+                data: { strLotNo: LotNo, strWKstatus : Categ},
+                    dataType: 'json',
+                success: function (Data) {
+                 if (Data.strboolbel == true && Data.strResult == "OK")
+                 {
+                     DataUndos = Data.data[0];
+                     var testcolumn = Object.getOwnPropertyNames(Data.data[0]);
+                     var strCountColumn = testcolumn.length;
+                     var strChartHtml1 = '';
+                     var strChartHtml = '';
+                     for (i = 0; i < strCountColumn; i++) {
+                         strChartHtml1 = strChartHtml1 + '<th></th>'
+                     }
+                     strChartHtml = strChartHtml + ' <table class="table table-sm table-bordered  table-striped nowrap  w-100 " id="myTable4ITEM" style="font-size:small;"><thead class="thead-dark"><tr>' + strChartHtml1;
+                     strChartHtml = strChartHtml + '</tr></thead><tbody></tbody><tfoot><tr>' + strChartHtml1;
+                     strChartHtml = strChartHtml + '</tr> </tfoot></table>'
+                     $("#myTable").html(strChartHtml);
+
+                     var count = '';
+                     for (var c in testcolumn) {
+                         count = count + '{"title":"' + testcolumn[c] + '"  },';
+                     }
+                     statuss = Data.data;
+                     var datas = '';
+                     for (var i in statuss) {
+                         datas = datas + '[';
+                         for (var j in testcolumn) {
+                             datas = datas + '"' + statuss[i][testcolumn[j]] + '",';
+                         }
+                         datas = datas + '],';
+                     }
+                     try {
+                         var dataObject1 = eval('[{"COLUMNS":[ ' + count + ' ],"DATA":[ ' + datas + ' ]}]');
+                         myTables = $('#myTable4ITEM').DataTable({
+                             paging: true,
+                             processing: true,
+                             deferRender: true,
+                             //dom: '<"top"lB>rt<"bottom"ip><"clear">',
+                             dom: '<"top" > <"bottom" ><"clear">',
+                             buttons: [
+                                 {
+                                     text: '<i class="fa fa-download"></i> Export excel.csv',
+                                     className: '  Button btn btn-success btn-sm',
+                                     action: function (e, dt, node, config) {
+                                         //alert('Activated!');
+                                         //this.disable(); // disable button
+                                         downloadDataDetail4Item();
+                                     }
+                                 }
+                             ],
+                             "data": dataObject1[0].DATA,
+                             "columns": dataObject1[0].COLUMNS,
+                             order: [0, "asc"],
+                             fnInitComplete: function (oSettings, json, sData) {
+                                 $(".se-pre-conF").fadeOut("slow");
+                                 return;
+                             },
+                         });
+                         //$("#framelblAlert").addClass("alert alert-success");
+                         Swal.fire({
+                             position: 'top-end',
+                             icon: 'success',
+                             title: 'Get Data Success',
+                             text: Data.dataLabel,
+                             showConfirmButton: false,
+                             timer: 1000
+                         })
+
+
+
+                         $("#txtUndoOrderNo").val(Data.data[0].OrderNo);
+                         $("#btnUndo").removeAttr('disabled');
+
+                         initialCtrl();
+                     } catch (e) {
+                         alert(e.message)
+                     }
+                 } else
+                     if (Data.strboolbel == false && Data.strResult == "OK") {
+
+                         Swal.fire({
+                             icon: 'warning',
+                             title: "Warning",
+                             text: Data.dataLabel,
+                             type: 'warning',
+                         })
+                     }
+                     else {
+
+                         Swal.fire({
+                             icon: 'warning',
+                             title: "Warning",
+                             text: Data.dataLabel,
+                             type: 'warning',
+                         })
+
+                     }
+             },
+             error: function (ex) {
+                 alert('Failed to retrieve states.' + ex);
+                    }
+                });
+
+
+        } 
+        function GetDatainquiry() {
+
+            var txtLotNo = $("#txtInLotNo").val();
+            var ddlLine = $("#ddlLine").val();
+            var ddlType = $("#ddlType").val();
+            var ddlProductCode = $("#ddlProductCode").val();
+            var txtStartTime = $("#txtStartTime").val();
+            var txtEndtime = $("#txtEndtime").val();
+            var ddlCancel_by = $("#ddlCancel_by").val();
+            var ddlCancelCode = $("#ddlCancelCode").val();
+
+            if (txtLotNo == "" &&
+                ddlLine == "" &&
+                ddlType == "" &&
+                ddlProductCode == "" &&
+                txtStartTime == "" &&
+                txtEndtime == "" &&
+                ddlCancel_by == "" &&
+                ddlCancelCode == ""
+            ) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "เดี๋ยวนะ",
+                    text: "ใส่อะไรหน่อยมั้ย ?",
+                    type: 'error',  
+                }) 
+                return false;
+                $("#txtInLotNo").focus();
+            }; 
+            $(".se-pre-conF").fadeIn("slow");
+            PicancelInquiryControl = [{
+                Lotno: txtLotNo,
+                Line: ddlLine,
+                type: ddlType,
+                ProductCode: ddlProductCode,
+                StartTime: txtStartTime,
+                EndTime: txtEndtime,
+                CancelBy: ddlCancel_by,
+                cancelCode: ddlCancelCode,
+            }];
+
+
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetPICancelInquiry")',
+                data: { Data: PicancelInquiryControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+                        DataUndos = Data.data[0];
+                        var testcolumn = Object.getOwnPropertyNames(Data.data[0]);
+                        var strCountColumn = testcolumn.length;
+                        var strChartHtml1 = '';
+                        var strChartHtml = '';
+                        for (i = 0; i < strCountColumn; i++) {
+                            strChartHtml1 = strChartHtml1 + '<th></th>'
+                        }
+                        strChartHtml = strChartHtml + ' <table class="table table-sm table-bordered  table-striped nowrap  w-100 " id="myTable4ITEM" style="font-size:small;"><thead class="thead-dark"><tr>' + strChartHtml1;
+                        strChartHtml = strChartHtml + '</tr></thead><tbody></tbody><tfoot><tr>' + strChartHtml1;
+                        strChartHtml = strChartHtml + '</tr> </tfoot></table>'
+                        $("#myTable").html(strChartHtml); 
+                        var count = '';
+                        for (var c in testcolumn) {
+                            count = count + '{"title":"' + testcolumn[c] + '"  },';
+                        }
+                        statuss = Data.data;
+                        var datas = '';
+                        for (var i in statuss) {
+                            datas = datas + '[';
+                            for (var j in testcolumn) {
+                                datas = datas + '"' + statuss[i][testcolumn[j]] + '",';
+                            }
+                            datas = datas + '],';
+                        }
+                        try {
+                            var dataObject1 = eval('[{"COLUMNS":[ ' + count + ' ],"DATA":[ ' + datas + ' ]}]');
+                            myTables = $('#myTable4ITEM').DataTable({
+                                paging: true,
+                                processing: true,
+                                deferRender: true, 
+                                dom: '<"top"lB>rt<"bottom"ip><"clear">', 
+                                buttons: [
+                                    {
+                                        text: '<i class="fa fa-download"></i> Export to excel',
+                                        className: '  Button btn btn-success btn-sm',
+                                        action: function (e, dt, node, config) { 
+                                            downloadDataDetail(PicancelInquiryControl[0]);
+                                        }
+                                    }
+                                ],
+                                "data": dataObject1[0].DATA,
+                                "columns": dataObject1[0].COLUMNS,
+                                order: [0, "asc"],
+                                fnInitComplete: function (oSettings, json, sData) {
+                                    $(".se-pre-conF").fadeOut("slow");
+                                    return;
+                                },
+                            }); 
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Get Data Success',
+                                text: Data.dataLabel,
+                                showConfirmButton: false,
+                                timer: 1000
+                            })  
+                            initialCtrl();
+                        } catch (e) {
+                            alert(e.message)
+                        }
+                    } else
+                        if (Data.strboolbel == false && Data.strResult == "OK") { 
+                            Swal.fire({
+                                icon: 'warning',
+                                title: "Warning",
+                                text: Data.dataLabel,
+                                type: 'warning',
+                            })
+                        }
+                        else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: "Warning",
+                                text: Data.dataLabel,
+                                type: 'warning',
+                            })
+
+                        }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            })
+        }
+        function downloadDataDetail(_Data) {
+          
+             var width = 800;
+            var height = 700;
+            var left = parseInt((screen.availWidth / 2) - (width / 2));
+            var top = parseInt((screen.availHeight / 2) - (height / 2));
+            var windowFeatures = "width=" + width + ",height=" + height +
+                ",status,resizable " +
+                ",scrollbars=yes"; 
+            var myWindow = window.open('@Url.Action("GetDataExportToExcel", "Home")', "subWind", windowFeatures, "POS");
+            @*$.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetDataExportToExcel")',
+                data: { Data: PicancelInquiryControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+
+                },
+                error: {
+                }
+            });*@
+        };
+    </script>
+}

@@ -1,0 +1,264 @@
+﻿<div class="container-fluid">
+    <div class=" ">
+        <div class="row">
+
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">CancelReason.</label>
+                    @Html.DropDownList("ddlCancelCode", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlCancelCode", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">LotNo.</label>
+                    @Html.TextBox("txtInLotNo", "", new { @class = "form-control form-control-sm ", @id = "txtInLotNo", @placeholder = "LotNo" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">Type.</label>
+                    @Html.DropDownList("ddlType", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlType", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">OrderNo.</label>
+                    @Html.TextBox("txtOrderNo", "", new { @class = "form-control form-control-sm ", @id = "txtOrderNo", @placeholder = "OrderNo." })
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">Status.</label>
+                    @Html.DropDownList("ddlStatus", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlStatus", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label for="txtStartTime" class="font-weight-bold">Cancel Start Date.</label>
+                    @Html.TextBox("txtStartTime", "", new { @class = "form-control form-control-sm datepikers", @id = "txtStartTime", @placeholder = "Choose Start Date" })
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group" id="divInputQty">
+                    <label for="txtEndtime" class="font-weight-bold">End Date.</label>
+                    @Html.TextBox("txtEndtime", "", new { @class = "form-control form-control-sm datepikers", @id = "txtEndtime", @placeholder = "Choose End Date" })
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class=" col-lg">
+                <div class="form-group">
+                    <buton class="btn btn-info " style="width:10vw" id="btnGOIInqSearch"><i class="fas fa-search"></i> Search</buton>
+                    <buton class="btn btn-secondary" id="btnClear"><i class="fas fa-sync"></i> Clear</buton>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class=" col-lg">
+                <div class=" table-responsive text-sm-center  " >
+                    <table id="tbOGIInquiry" class="table table-sm table-bordered  table-striped nowrap  w-100 " style="font-size:small;">
+                        <thead class="thead-dark">
+                            <tr>
+                               
+                                <th>No</th>
+                                <th>LotNo</th>
+                                <th>OrderNo</th>
+                                <th>ProdFamily</th>
+                                <th>Type</th>
+                                <th>ProductCode</th>
+                                <th>RBCTGR</th>
+                                <th>CancelQty</th>
+                                <th>CancelCode</th>
+                                <th class="nowrap">CancelReason</th>
+                                <th>cancelDate</th>
+                                <th>OperatorName</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                       
+                    </table> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var myTables;
+    var dataArry;
+    function GetTypeOGI() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetTypeOGI", "OGI")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlType").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+    }
+    function GetStatusOGI() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetStatusOGI", "OGI")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlStatus").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+    }
+
+    function GetdataTables() {
+         
+        myTables = $('#tbOGIInquiry').DataTable({
+            paging: true,
+            processing: true,
+            deferRender: true, 
+            //dom: '<"top"l>rt<"bottom"ip><"clear">',
+            dom: '<"top"lB>rt<"bottom"ip><"clear">',
+            columns: [ 
+                { data: 'No' },
+                { data: 'LotNo' },
+                { data: 'OrderNo' },
+                { data: 'ProdFamily' },
+                { data: 'Type' },
+                { data: 'ProductCode' },
+                { data: 'RBCTGR' },
+                { data: 'CancelQty' },
+                { data: 'CancelCode' },
+                { data: 'CancelReason' },
+                { data: 'cancelDate' },
+                { data: 'OperatorName' },
+
+            ],
+            buttons: [
+                {
+                    text: '<i class="fa fa-download"></i> Export excel.csv',
+                    className: '  Button btn btn-success btn-sm',
+                    action: function (e, dt, node, config) { 
+                        downloadDataDetail4Item();
+                    }
+                }
+            ], 
+             
+            order: [0, "asc"],
+          
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });   
+
+
+        $("#btnGOIInqSearch").on("click", function () { 
+
+            dataArry = [{
+                CancelReason: $("#ddlCancelCode").val()
+                , LotNo: $("#txtInLotNo").val()
+                , Type: $("#ddlType").val()
+                , OrderNo: $("#txtOrderNo").val()
+                , Status: $("#ddlStatus").val()
+                , StartDate: $("#txtStartTime").val()
+                , EndDate: $("#txtEndtime").val() 
+            }]
+            $.ajax({
+            type: 'POST',
+                url: '@Url.Action("GetDataInquiry", "OGI")',
+                data: { DataCondition: dataArry[0]},
+            dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {  
+                      
+                        myTables.rows.add(Data.data).draw();
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: Data.dataLabel,
+                            
+                            type: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                        
+
+                    } else
+                        if (Data.strboolbel == false && Data.strResult == "OK") {
+                            $("#framelblAlert").addClass("alert alert-danger");
+                            $("#lblAlert").text(Data.dataLabel);
+                        } else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+                                $("#framelblAlert").removeClass("alert alert-primary");
+                                $("#lblAlert").text("");
+                                return false;
+                            }
+                            else {
+                                debugger
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                })
+                                $("#framelblAlert").removeClass("alert alert-primary");
+                                $("#lblAlert").text("");
+                            }
+
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+
+
+        });
+
+        function downloadDataDetail4Item() {
+
+              var width = 800;
+            var height = 700;
+            var left = parseInt((screen.availWidth / 2) - (width / 2));
+            var top = parseInt((screen.availHeight / 2) - (height / 2));
+            var windowFeatures = "width=" + width + ",height=" + height +
+                ",status,resizable " +
+                ",scrollbars=yes"; 
+
+            if (myTables.rows().count() == 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Data not found",
+                    type: 'warning',
+                })
+                return false;
+            } else {
+            var myWindow = window.open('@Url.Action("GetDataExportToExcel", "OGI")', "subWind", windowFeatures, "POS");
+            }
+        }
+    }
+</script>

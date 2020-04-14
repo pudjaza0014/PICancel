@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no ,shrink-to-fit=no" />
+    <!-- Web Fonts  -->
+    @* <link href="~/Content/Site.css" rel="stylesheet" />*@
+    <link href="~/Theme/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/colReorder.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedColumns.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedHeader.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/keyTable.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/rowGroup.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/rowReorder.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/scroller.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/select.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/buttons.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Theme/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Theme/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/Content/myStyle.css" rel="stylesheet" />
+    <link href="~/Theme/vendor/metisMenu/metisMenu.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/Content/datepicker.css" rel="stylesheet" />
+    <link rel="icon" href="~/img/Logo.png">
+    <style>
+        .table {
+            border-color: #ededed;
+            border-style: solid;
+        }
+
+            .table thead {
+                background-color: #97cbdc;
+                color: #FFF;
+            }
+
+        #myTable tbody {
+            color: #000;
+        }
+
+        .scroll-box {
+            overflow-y: scroll;
+            height: 70vh;
+        }
+
+        .TextColorsBlue {
+            color: #004581;
+        }
+
+        .forFocus {
+            border: 5px solid red;
+        }
+
+        .btn-grad-succ {
+            background-image: linear-gradient(to right, #1FA2FF 0%, #12D8FA 100%);
+            color: #fff;
+        }
+
+            .btn-grad-succ:hover {
+                background-image: linear-gradient(to right, #1FA2FF 0%, #1779bf 100%);
+                color: #c9f7ff;
+            }
+
+        .btn-grad-excel {
+            background-image: linear-gradient(to right,#56ab2f 0%, #a8e063 100%);
+            color: #fff;
+        }
+
+            .btn-grad-excel:hover {
+                background-image: linear-gradient(to right, #a8e063 99%, #a8e063 100%);
+                color: #1D976C;
+            }
+
+        .btn-grad-reset {
+            background-image: linear-gradient(to right,#FF5F6D 0%,#FFC371 100%);
+            color: #fff;
+        }
+
+            .btn-grad-reset:hover {
+                background-image: linear-gradient(to right, #FFC371 99%, #FF5F6D 100%);
+                color: #FF5F6D;
+            }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 3000;
+            background: url('../img/Preloader_8.gif') center no-repeat #fff;
+            /*background-color:white;*/
+        }
+
+        .se-pre-conF {
+            opacity: 0.7;
+            display: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 3000;
+            background: url('../img/Preloader_8.gif') center no-repeat;
+            background-color: white;
+        }
+
+
+
+        .bg-Imge {
+            background: url('../../img/260161.jpg');
+            background-repeat: no-repeat;
+            background-size: auto;
+        }
+    </style>
+</head>
+<body class="bg-Imge">
+    @{
+        Html.RenderPartial("_partial/_PartHeader");
+    }
+    <div class="container">
+        <!-- Outer Row -->
+        <div class="row justify-content-center" >
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome To <kbd>PI CANCEL</kbd></h1>
+                                    </div>
+                                    <div>
+                                        @RenderBody()
+                                    </div>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="small " href="http://10.29.1.141/"><i class="fas fa-file-alt"></i> <span class="text-uppercase">User's Manual</span> (คู่มือ)</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small " href="http://10.29.1.141/"><i class="fas fa-arrow-alt-circle-left"></i> Go to <b>RTHWEB</b></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Theme/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Theme/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="~/Theme/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Custom scripts for all pages-->
+
+    <script src="~/Theme/js/sb-admin-2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.colReorder.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedColumns.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedHeader.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.keyTable.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/DataTables/responsive.bootstrap4.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowGroup.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.select.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.buttons.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.bootstrap.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.flash.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.html5.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.print.min.js"></script>
+    <script src="~/Scripts/DataTables/jszip.min.js"></script>
+    <script src="~/Scripts/DataTables/sweetalert.min.js"></script>
+    <script src="~/Theme/vendor/metisMenu/metisMenu.min.js"></script>
+    <script src="~/Scripts/bootstrap-datepicker.min.js"></script>
+    <script src="~/Scripts/datepicker.js"></script>
+    <script src="~/Theme/vendor/chart.js/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="~/Scripts/sweetalert.min.js"></script>
+    <script src="~/Scripts/toBlob.js"></script>
+    <script src="~/Scripts/JavaScript1.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script src="~/Scripts/HomeScript/GetDataScript.js"></script>
+    <script>
+        function myFunction() {
+            location.reload();
+        }
+        $(".nav-link1 ").on("click", function () {
+            sessionStorage.clear();
+        });
+        $(document).ready(function () {
+
+            var interval = setInterval(function () {
+                var momentNow = moment();
+                $('#date-part').html(momentNow.format('DD MMM YYYY') + ' '
+                    + momentNow.format(' hh:mm:ss A'));
+                //$('#time-part').html(momentNow.format('A hh:mm:ss'));
+            }, 100);
+
+            $("#lblDate").html();
+            $("#lblcomputerName").html(sessionStorage.getItem("ssCOMPUTERNAME"));
+            $("#lblOPID").html(sessionStorage.getItem("ssUSERNAME"));
+        });
+    </script>
+</body>
+</html>

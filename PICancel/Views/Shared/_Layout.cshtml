@@ -1,0 +1,343 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no ,shrink-to-fit=no" />
+    <!-- Web Fonts  -->
+    @* <link href="~/Content/Site.css" rel="stylesheet" />*@
+    <link href="~/Theme/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/colReorder.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedColumns.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedHeader.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/keyTable.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/rowGroup.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/rowReorder.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/scroller.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/select.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/buttons.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Theme/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Theme/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/Content/myStyle.css" rel="stylesheet" />
+    <link href="~/Theme/vendor/metisMenu/metisMenu.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/Content/datepicker.css" rel="stylesheet" />
+    <link rel="icon" href="~/img/Logo.png">
+    <style>
+        .table {
+            border-color: #ededed;
+            border-style: solid;
+        }
+
+            .table thead {
+                background-color: #97cbdc;
+                color: #FFF;
+            }
+
+        #myTable tbody {
+            color: #000;
+        }
+
+        .scroll-box {
+            overflow-y: scroll;
+            height: 70vh;
+        }
+
+        .TextColorsBlue {
+            color: #004581;
+        }
+
+        .forFocus {
+            border: 5px solid red;
+        }
+
+        .btn-grad-succ {
+            background-image: linear-gradient(to right, #1FA2FF 0%, #12D8FA 100%);
+            color: #fff;
+        }
+
+            .btn-grad-succ:hover {
+                background-image: linear-gradient(to right, #1FA2FF 0%, #1779bf 100%);
+                color: #c9f7ff;
+            }
+
+        .btn-grad-excel {
+            background-image: linear-gradient(to right,#56ab2f 0%, #a8e063 100%);
+            color: #fff;
+        }
+
+            .btn-grad-excel:hover {
+                background-image: linear-gradient(to right, #a8e063 99%, #a8e063 100%);
+                color: #1D976C;
+            }
+
+        .btn-grad-reset {
+            background-image: linear-gradient(to right,#FF5F6D 0%,#FFC371 100%);
+            color: #fff;
+        }
+
+            .btn-grad-reset:hover {
+                background-image: linear-gradient(to right, #FFC371 99%, #FF5F6D 100%);
+                color: #FF5F6D;
+            }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 3000;
+            background: url('../img/Preloader_8.gif') center no-repeat #fff;
+            /*background-color:white;*/
+        }
+
+        .se-pre-conF {
+            opacity: 0.7;
+            display: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 3000;
+            background: url('../img/Preloader_8.gif') center no-repeat;
+            background-color: white;
+        }
+    </style>
+</head>
+<body id="page-top">
+    <div class="se-pre-con "></div> 
+    @{
+        Html.RenderPartial("_partial/_partMenuControl");
+    } 
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content" >
+            @{
+                Html.RenderPartial("_partial/_PartHeader");
+            }
+
+            <div class="container-fluid " >
+                @RenderBody()
+            </div>
+        </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <footer class="sticky-footer  footerColor" style="background-color:#DEE4E9;">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Rohm Integrated Systems Thailand Co.,Ltd. 2019</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/Theme/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Theme/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="~/Theme/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Custom scripts for all pages-->
+
+    <script src="~/Theme/js/sb-admin-2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.colReorder.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedColumns.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedHeader.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.keyTable.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/DataTables/responsive.bootstrap4.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowGroup.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowReorder.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.select.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.buttons.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.bootstrap.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.flash.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.html5.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.print.min.js"></script>
+    <script src="~/Scripts/DataTables/jszip.min.js"></script>
+    <script src="~/Scripts/DataTables/sweetalert.min.js"></script>
+    <script src="~/Theme/vendor/metisMenu/metisMenu.min.js"></script>
+    <script src="~/Scripts/bootstrap-datepicker.min.js"></script>
+    <script src="~/Scripts/datepicker.js"></script>
+    <script src="~/Theme/vendor/chart.js/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="~/Scripts/sweetalert.min.js"></script>
+    <script src="~/Scripts/toBlob.js"></script>
+    <script src="~/Scripts/JavaScript1.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+    <script src="~/Scripts/HomeScript/GetDataScript.js"></script>
+    <script>
+        function myFunction() {
+            location.reload();
+        }
+        $(".nav-link1 ").on("click", function () {
+            sessionStorage.clear();
+        });
+        $(document).ready(function () {
+            
+            var interval = setInterval(function () {
+                var momentNow = moment();
+                $('#date-part').html(momentNow.format('DD MMM YYYY') + ' '
+                    + momentNow.format(' hh:mm:ss A'));
+                //$('#time-part').html(momentNow.format('A hh:mm:ss'));
+            }, 100);
+
+            $("#lblDate").html();
+            $("#lblcomputerName").html(sessionStorage.getItem("ssCOMPUTERNAME"));
+            $("#lblOPID").html(sessionStorage.getItem("ssUSERNAME"));
+            GetMenuSide();
+            $(".allowNumOnly").on("keypress keyup blur", function (event) {
+                $(this).val($(this).val().replace(/[^\d].+/, ""));
+                if ((event.which < 48 || event.which > 57)) {
+                    event.preventDefault();
+                }
+            });
+        });
+        $("#btnLogOut").on("click", function () {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Select ''Logout'' below if you are ready to end your current session.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Logout'
+            }).then(function (result) {
+                if (result.value) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("GetLogOut","Home")',
+                        dataType: 'json',
+                        success: function (Data) {
+                           if (Data.strboolbel == true && Data.strResult == "OK") {
+                                sessionStorage.clear();
+                               
+                               window.open("@Url.Action("Login","Home")", '_blank');
+                                window.close();
+                          }else {
+                                $("#txtUserName").val("");
+                                $("#txtPassword").val("");
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                }).then(function () {
+                                    $("#txtUserName").focus();
+                                    return ;
+                                    });
+                                }
+                        },
+                        error: function (ex) {
+                                alert('Failed to retrieve states.' + ex);
+                        }
+                    });
+
+
+
+
+
+                }
+            })
+
+
+
+
+        });
+
+
+        function clearSession(e) {
+            $.ajax({
+                        type: 'POST',
+                url: '@Url.Action("GetLogOut")',
+                data: { strStatus: e},
+                        dataType: 'json',
+                        success: function (Data) {
+                           if (Data.strboolbel == true && Data.strResult == "OK") {
+                               sessionStorage.clear();
+                              
+                                //window.close();
+                          }else {
+                                $("#txtUserName").val("");
+                                $("#txtPassword").val("");
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                }).then(function () {
+                                    $("#txtUserName").focus();
+                                    return ;
+                                    });
+                                }
+                        },
+                        error: function (ex) {
+                                alert('Failed to retrieve states.' + ex);
+                        }
+                    });
+
+        }
+        function GetMenuSide() {
+            $.ajax({
+                        type: 'POST',
+                url: '@Url.Action("GetManuSide","initial",new { Event = "2" })',
+
+                        dataType: 'json',
+                        success: function (Data) {
+                            if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                              // $("#testMenu").html(Data.data);
+
+                                $("#testMenu").html(Data.data[0]).text();
+                                //$("#testMenu1").html(Data.data[1]).text();
+
+
+                                $("#testMenu1").append(Data.data[1]);
+                          }else {
+
+
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                }).then(function () {
+                                    $("#txtUserName").focus();
+                                    return ;
+                                    });
+                                }
+                        },
+                        error: function (ex) {
+                                alert('Failed to retrieve states.' + ex);
+                        }
+                    });
+
+        }
+        function DecodeHtml(str) {
+            return $('<div/>').html(str).text();
+        }
+    </script>
+</body>
+</html>

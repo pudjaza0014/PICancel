@@ -1,0 +1,152 @@
+﻿<div class="row">
+    <div class=" col-lg">
+        <div class="table-responsive-lg text-center" style="font-size:small;">
+            <table id="tbOrderError" class="table table-bordered table-striped table-sm nowrap w-100 text-sm-center">
+                <thead>
+                    <tr>
+                        <th>Select box</th>
+                        <th>No</th>
+                        <th>OrderNo</th>
+                        <th>ProductCode</th>
+                        <th>TRNo</th>
+                        <th>Spec</th>
+                        <th>Pack</th>
+                        <th>hFERank</th>
+                        <th>RohmLine</th>
+                        <th>Type</th>
+                        <th>OrderQty</th>
+                        <th>InputDate</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th>Select box</th>
+                        <th>No</th>
+                        <th>OrderNo</th>
+                        <th>ProductCode</th>
+                        <th>TRNo</th>
+                        <th>Spec</th>
+                        <th>Pack</th>
+                        <th>hFERank</th>
+                        <th>RohmLine</th>
+                        <th>Type</th>
+                        <th>OrderQty</th>
+                        <th>InputDate</th>
+                        <th>Message</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <buton class="btn btn-success" id="btnSave" style="min-width:7vw"><i class="fas fa-save"></i> Save</buton>
+    </div>
+</div> 
+<script>
+    var myTables;
+
+
+    function GetdataTables() {
+
+        myTables = $('#tbOrderError').DataTable({
+            scrollY: "200px",
+            paging: true,
+            processing: true,
+            deferRender: true,
+            //dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            columns: [
+                {
+                    targets: 0, 
+                    data: '',
+                    defaultContent: '',
+                    orderable: false,
+                    className: 'select-checkbox'
+                },
+                { data: 'No' },
+                { data: 'OrderNo' },
+                { data: 'ProductCode' },
+                { data: 'TRNo' },
+                { data: 'Spec' },
+                { data: 'Pack' },
+                { data: 'hFERank' },
+                { data: 'RohmLine' },
+                { data: 'Type' }, 
+                { data: 'OrderQty' },
+                { data: 'InputDate' },
+                { data: 'Message' }, 
+
+            ],
+            buttons: [
+                //{
+                //    text: '<i class="fa fa-download"></i> Export excel.csv',
+                //    className: '  Button btn btn-success btn-sm',
+                //    action: function (e, dt, node, config) {
+                //        downloadDataDetail();
+                //    }
+                //},
+                {
+                    text: 'Select all',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().select();
+                    }
+                },
+                {
+                    text: 'Select none',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().deselect();
+                    }
+                }
+            ],
+            columnDefs: [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+        $("#btnSave").on("click", function () {
+            Swal.fire({
+                icon: 'success',
+                title: "success",
+                text: "@ViewBag.Event",
+                type: 'success',
+            })
+        });
+
+    }
+
+    function DrawDatatoTable(Data) {
+        try {
+            myTables.rows.add(Data.data).draw();
+            myTables.rows().select();
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: Data.dataLabel,
+                type: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } catch(e) {
+             Swal.fire({
+                icon: 'warning',
+                 title: "warning",
+                 text: e.Message,
+                 type: 'warning',
+            })
+        }
+    };
+
+</script>

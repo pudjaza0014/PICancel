@@ -1,0 +1,63 @@
+﻿@model  PICancel.Models.ListPICancelMenu
+@{
+    //ViewBag.Title = "Index";
+}
+<style>
+    .font-Text {
+        font-family: 'Cordia New';
+    }
+</style>
+
+<div class="container" >
+   
+    @*<div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=LotCancel" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>1</u>. Lot Cancel</h1></a>
+             </div>
+             <div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=OrderCancel" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>2</u>. Order Cancel</h1></a>
+             </div>
+             <div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=LotCancelReinput" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>3</u>. Lot Cancel Re-Input</h1></a>
+             </div>
+             <div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=UndoCancel" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>4</u>. Undo Cancel</h1></a>
+             </div>
+             <div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=CancelInquiry" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>5</u>. Lot Cancel Inquiry</h1></a>
+             </div>
+             <div class="p-2">
+                 <a href="@Url.Action("LotCancel")?Event=LotCancelReflow" value="LotCancel" class="btn btn-lg btn-block btn-info"><h1><u>6</u>. Lot Cancel Reflow</h1></a>
+        </div> *@
+    <div class="text-center">
+        @*<h1>ระบบ PICANCEL สร้างมาเพื่อใคร</h1>*@
+    </div>
+</div>
+
+@section Scripts    {
+    <script>
+        var myTables;
+        $(document).ready(function () {
+        var COMPUTERNAME = '@ViewBag.COMPUTERNAME';
+        var USERNAME = '@ViewBag.USERNAME';
+            sessionStorage.setItem("ssUSERNAME", USERNAME);
+            sessionStorage.setItem("ssCOMPUTERNAME", COMPUTERNAME);
+        });
+        onReady(function () {
+             
+            $(".se-pre-con").fadeOut("slow");
+            return false;
+        });
+        function onReady(callback) {
+            var intervalId = window.setInterval(function () {
+                if (document.getElementsByTagName('body')[0] !== undefined) {
+                    window.clearInterval(intervalId);
+                    callback.call(this);
+                }
+            }, 1000);
+        }
+
+
+    </script>
+
+
+}

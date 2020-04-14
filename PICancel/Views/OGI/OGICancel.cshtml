@@ -1,0 +1,95 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    if (@ViewBag.Event == "CancelConfirm")
+    {
+        Html.RenderPartial("_partialOGI/_PartOGICancelConfirm");
+    }
+    else if (@ViewBag.Event == "CancelInquiry")
+    {
+        Html.RenderPartial("_partialOGI/_PartOGICancelInquiry");
+    }
+
+}
+@section Scripts    {
+    <script>
+        var myDataPicker;
+
+         $(document).ready(function (){
+            GetDefault();
+            var strEvent = '@ViewBag.Event';
+            sessionStorage.setItem("ssEvent", strEvent);
+              var strWKstatus = '@ViewBag.WKstatus';
+            sessionStorage.setItem("ssWKstatus", strWKstatus);
+             @*getformatDefault();*@
+        });
+
+        onReady(function () {
+            $(".se-pre-con").fadeOut("slow");
+            return false;
+        });
+        function onReady(callback) {
+            var intervalId = window.setInterval(function () {
+                if (document.getElementsByTagName('body')[0] !== undefined) {
+                    window.clearInterval(intervalId);
+                    callback.call(this);
+                }
+            }, 1000);
+        }
+        function GetDefault() {
+            myDataPicker = $('.datepikers').datepicker({
+                language: 'en',
+                dateFormat: 'dd M yyyy',
+                minView: 'days',
+                view: 'days',
+                maxDate: new Date()
+            }).data('datepicker');
+            GetCancelCode();
+            GetdataTables();
+            if ("@ViewBag.Event" == "CancelConfirm")
+            { 
+                GetCancelOperator();
+            } else if ("@ViewBag.Event" == "CancelInquiry")
+            {
+
+                GetTypeOGI();
+                GetStatusOGI();
+                
+            }
+
+        } 
+        function GetCancelCode() {
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetCancelCodeReason","OGI")',
+            dataType: 'json',
+                success: function (citys) {
+                    if (citys.length != 0) {
+                        $.each(citys, function (i, city) {
+                            $("#ddlCancelCode").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                        });
+                        if ("@ViewBag.Event" == "CancelConfirm") {
+                            if ("@ViewBag.AuthorityLV" == "9") {
+                                $("#ddlCancelCode").val("33");
+                                $("#ddlCancelCode").prop('disabled', true);
+
+                            }
+                        }
+
+
+                    }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+             });
+        }
+        $("#btnClear").on("click", function () {
+            myFunction();
+        });
+
+
+    </script>
+}

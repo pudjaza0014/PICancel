@@ -1,0 +1,208 @@
+﻿<div class="row">
+    <div class=" col-lg">
+        <div class="table-responsive-lg text-center">
+            <table id="tbNoChip" class="table table-bordered table-striped table-sm nowrap w-100  ">
+                <thead>
+                    <tr>
+                        <th>Select box</th>
+                        <th>No</th>
+                        <th>OrderNo</th>
+                        <th>ProductCode</th>
+                        <th>TRNo</th>
+                        <th>Spec</th>
+                        <th>Pack</th>
+                        <th>hFERank</th>
+                        <th>RohmLine</th>
+                        <th>Type</th>
+                        <th>InputDate</th>
+                        <th>OrderQtyOrg</th>
+                        <th>OrderQty</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th>Select box</th>
+                        <th>No</th>
+                        <th>OrderNo</th>
+                        <th>ProductCode</th>
+                        <th>TRNo</th>
+                        <th>Spec</th>
+                        <th>Pack</th>
+                        <th>hFERank</th>
+                        <th>RohmLine</th>
+                        <th>Type</th>
+                        <th>InputDate</th>
+                        <th>OrderQtyOrg</th>
+                        <th>OrderQty</th>
+                        <th>Message</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <buton class="btn btn-success" id="btnSave" style="min-width:7vw"><i class="fas fa-save"></i> Save</buton>
+        <buton class="btn btn-danger" id="btnSave"><i class="fas fa-trash-alt"></i> Delete</buton>
+    </div>
+</div>
+
+<script>
+    var myTables;
+
+
+    function GetdataTables() {
+
+
+
+        myTables = $('#tbNoChip').DataTable({
+            scrollY: "200px",
+            paging: false,
+            processing: true,
+            deferRender: true,
+            //dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            //dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            dom: '<"top"B>rt<"bottom"ip><"clear">',//มี Buttons ,ไม่มีแบ่งpage บนหัว Table
+            columns: [
+                {
+                    targets: 0,
+
+                    data: '',
+                    defaultContent: '',
+                    orderable: false,
+                    className: 'select-checkbox'
+                },
+                { data: 'No' },
+                { data: 'OrderNo' },
+                { data: 'ProductCode' },
+                { data: 'TRNo' },
+                { data: 'Spec' },
+                { data: 'Pack' },
+                { data: 'hFERank' },
+                { data: 'RohmLine' },
+                { data: 'Type' },
+                { data: 'InputDate' },
+                { data: 'OrderQtyOrg' },
+                //{ data: 'OrderQty' },
+
+                {
+                    data: 'OrderQty',
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        var OrderQty = oData.OrderQty;
+                        var OrderNo = oData.OrderNo;
+
+                        //var PassParamEdit = '"data":"' + oData.ItemCode + '","Types":"' + SuplierCode + '"';
+                        //$(nTd).html("<input type='button' class='btn btn-sm btn-danger'>DELETE</button> ");
+                        $(nTd).html("<input type='text' id='" + OrderNo + "' name='" + OrderNo +"' class='allowNumOnly form-control form-control-sm' value='" + OrderQty+"' />");
+                    }
+                },
+                { data: 'Message' },
+            ],
+            buttons: [
+                {
+                    text: 'Select all',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().select();
+                    }
+                },
+
+                {
+                    text: 'Select none',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().deselect();
+                    }
+                }
+            ],
+            columnDefs: [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+
+
+
+
+
+
+
+
+        $("#btnSave").on("click", function () {
+            var DocNo;
+            if ($("#txtDocNo2").val() == "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Please Input RunNo",
+                    type: 'warning',
+                });
+                return false;
+            } else {
+                DocNo = $("#txtDocNo2").val();
+            };
+
+
+            var oData = myTables.rows('.selected').data();
+            var ItemCode = []
+
+            for (var i = 0; i < oData.length; i++) {
+                ItemCode.push({
+                    "OrderNo": oData[i]["OrderNo"],
+                    "OrderQtyOrg": oData[i]["OrderQtyOrg"],
+                    "OrderQty": $('#' + oData[i]["OrderNo"] + '').val()
+                });
+            };
+
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EntryNoChip", "Rohm")',
+                data: { dataRohmOrderQty: ItemCode, strRunNo:DocNo},
+            dataType: 'json',
+            success: function (citys) {
+                debugger
+            },
+            error: function (ex) {
+                alert('Failed to retrieve states.' + ex);
+            }
+        });
+            //var data = myTables.rows('.selected').$('input').serializeArray();
+
+
+        });
+
+
+    }
+    function DrawDatatoTable(Data) {
+        try {
+            myTables.rows.add(Data.data).draw();
+            myTables.rows().select();
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: Data.dataLabel,
+                type: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } catch (e) {
+            Swal.fire({
+                icon: 'warning',
+                title: "warning",
+                text: e.Message,
+                type: 'warning',
+            })
+        }
+    };
+
+</script>

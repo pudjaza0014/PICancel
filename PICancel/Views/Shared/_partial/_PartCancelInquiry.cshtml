@@ -1,0 +1,84 @@
+﻿
+<div class="se-pre-conF"></div>
+<div class="container-fluid">
+    <div class="">
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtLotNo" class="font-weight-bold">LotNo.</label>
+                    @Html.TextBox("txtInLotNo", "", new { @class = "form-control form-control-sm ", @id = "txtInLotNo", @placeholder = "LotNo" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="ddlLine" class="font-weight-bold">Line.</label>
+                    @Html.DropDownList("ddlLine", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlLine", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="ddlType" class="font-weight-bold">Type.</label>
+                    @Html.DropDownList("ddlType", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlType", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtProductCode" class="font-weight-bold">ProductCode.</label>
+                    @Html.DropDownList("ddlProductCode", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlProductCode", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="txtStartTime" class="font-weight-bold">Cancel Start Date.</label>
+                    @Html.TextBox("txtStartTime", "", new { @class = "form-control form-control-sm datepikers", @id = "txtStartTime", @placeholder = "Choose Start Date" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group" id="divInputQty">
+                    <label for="txtEndtime" class="font-weight-bold">Cancel End Date.</label>
+                    @Html.TextBox("txtEndtime", "", new { @class = "form-control form-control-sm datepikers", @id = "txtEndtime", @placeholder = "Choose End Date" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="ddlLine" class="font-weight-bold">Cancel By.</label>
+                    @Html.DropDownList("ddlCancel_by", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlCancel_by", @class = " form-control form-control-sm", width = "300px" })
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group">
+                    <label for="ddlType" class="font-weight-bold">Cancel Code.</label>
+                    @Html.DropDownList("ddlCancelCode", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlCancelCode", @class = " form-control form-control-sm", width = "100px" })
+                    @Html.TextBox("txtCancelReason", "", new { @class = "form-control form-control-sm form-control-plaintext  ", @id = "txtCancelReason", @placeholder = "Cancel Reason.", @disabled = "disabled" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group">
+                    <buton class="btn btn-info" id="btnSearch"><i class="fas fa-search"></i> Search</buton>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-lg">
+                <div class=" table-responsive text-sm-center  ">
+                    <div id="myTable"  >
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="text-center">
+                    @*<button class="btn btn-success btn-lg"><i class="fas fa-file-excel"></i> Export to Excel </button>*@
+                    <button class="btn btn-secondary btn-lg" id="btnRefresh" onclick=" myFunction()"><i class="fas fa-sync"></i> Clear </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
