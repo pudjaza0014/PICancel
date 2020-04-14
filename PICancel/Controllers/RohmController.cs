@@ -8,6 +8,8 @@ using PICancel.Models;
 using ClosedXML.Excel;
 using System.IO;
 using System.Configuration;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
 
 namespace PICancel.Controllers
 {
@@ -114,7 +116,7 @@ namespace PICancel.Controllers
             }
             else
             {
-                strRunNo = Convert.ToString( Convert.ToInt32(dt.Rows[0][""].ToString())+1).PadLeft(3, '0');
+                strRunNo = Convert.ToString( Convert.ToInt32(dt.Rows[0]["RunningNo"].ToString())+1).PadLeft(3, '0');
             }
             
 
@@ -125,32 +127,152 @@ namespace PICancel.Controllers
         }
 
 
-        public JsonResult EntryNoChip(List<RohmOrderQty> dataRohmOrderQty,string strRunNo)
+        public JsonResult EntryNoChip(List<RohmOrderQty> dataRohmOrderQty )
         {
             string _Result = "OK";
-            string _strRunNo = strRunNo;
+            string _strRunNo = "";
+            string strDocNo = dataRohmOrderQty[0].strRunNo1 + dataRohmOrderQty[0].strRunNo2;
             string _DataResult = "";
-            Boolean _ResultLabel = true;  
-            List<RohmOrderNOChip> OrderNoChipList = new List<RohmOrderNOChip>();
-
+            Boolean _ResultLabel = true;
+            int Seqno = 1; 
+            dt = new DataTable(); 
+            List<RohmOrderNOChip> OrderNoChipList = new List<RohmOrderNOChip>(); 
             try
             {
-                _strRunNo = Convert.ToString(Convert.ToInt32(strRunNo.Trim())).PadLeft(3,'0');
+                string DataResult;
+                foreach(RohmOrderQty Dataitem in dataRohmOrderQty)
+                {
+                    _strRunNo = Convert.ToString(Convert.ToInt32(Dataitem.strRunNo2.Trim())).PadLeft(3, '0');
+                    string _orderNo = Dataitem.OrderNo;
+                    int _orderQty = Dataitem.OrderQty;
+                    int _originQty = Dataitem.OrderQtyOrg;
+                    string strRunNo1 = Dataitem.strRunNo1;
+                    string strCagte = Dataitem.CategType;
+                    int Condition = 2;
+                    if(_originQty != _orderQty)
+                    {
+                        Condition = 3;
+                    }
+                    else
+                    {
+                        _orderQty = 0;
+                    }
 
-
-
-
-
+                    DataResult = objrun.OrderDeleteChangeRohm(_orderNo, strRunNo1+_strRunNo, strCagte,Condition,_orderQty,Seqno, Session["OPID"] as string);
+                    
+                    if(DataResult != "0")
+                    {
+                        _ResultLabel = false;
+                        _Result = "Error";
+                        _DataResult = (DataResult == "1" ? "Error sprOrderDeleteChangRohm '" + _orderNo + "' " : DataResult) + "Please Contact IS. 4611 , 4612";
+                        break;
+                    }
+                    else
+                    {
+                        Seqno++;
+                    }
+                   
+                }
+                
+                _DataResult = Seqno-1 == dataRohmOrderQty.Count ? "Success" : "Error";
 
             }
             catch(Exception e)
             {
 
             }
-
-            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = OrderNoChipList  }, JsonRequestBehavior.AllowGet);
+            int Export = ExportReport(strDocNo);
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = strDocNo }, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
+        }
+
+        public int ExportReport(string DocNo)
+        {
+            try { 
+            ConnectionInfo myconnectioninfo = new ConnectionInfo();
+            ConnectionStringSettings ConnectionStringSettings = ConfigurationManager.ConnectionStrings["TRPIConnectionString"];
+            var connectionStringPieces = ConnectionStringSettings.ConnectionString.Split(';');
+            foreach (string connectionStringPiece in connectionStringPieces) {
+                string[] connectionSubPieces = connectionStringPiece.Split('=');
+
+                string key = connectionSubPieces[0].ToLower();
+                string value = connectionSubPieces[1];
+                switch (key)
+                    {
+                        case "data source":
+                            myconnectioninfo.ServerName = value;
+                            break;
+                        case "server":
+                            myconnectioninfo.ServerName = value;
+                            break;
+                        case "initial catalog":
+                            myconnectioninfo.DatabaseName = value;
+                            break;
+                        case "user id":
+                            myconnectioninfo.UserID = value;
+                            break;
+                        case "password":
+                            myconnectioninfo.Password = value;
+                            break;
+                        case "pwd":
+                            myconnectioninfo.Password = value;
+                            break;
+                    }
+                    //    Case "data source", "server"
+                    //        myconnectioninfo.ServerName = value
+                    //    Case "initial catalog"
+                    //        myconnectioninfo.DatabaseName = value
+                    //    Case "user id", "uid"
+                    //        myconnectioninfo.UserID = value
+                    //    Case "pwd", "password"
+                    //        myconnectioninfo.Password = value
+                    //End Select
+                }
+
+            ReportDocument cryRpt = new ReportDocument();
+            TableLogOnInfo crtableLogoninfo = new TableLogOnInfo();
+            ConnectionInfo crConnectionInfo = new ConnectionInfo();
+            Tables CrTables;
+            cryRpt.Load(Path.Combine(Server.MapPath("~/Report"), "RptOrderChang.rpt"));
+            cryRpt.SetParameterValue("DocNo",DocNo);
+            cryRpt.SetParameterValue("DocNo", DocNo.Trim());
+                //cryRpt.SetParameterValue("Condition-2", "1");
+                //cryRpt.SetParameterValue("Condition-3", "0");
+                cryRpt.SetParameterValue("Condition-2", objrun.GetCountCondition(DocNo.Trim(), 2));
+                cryRpt.SetParameterValue("Condition-3", objrun.GetCountCondition(DocNo.Trim(), 3));
+
+                crConnectionInfo.ServerName = myconnectioninfo.ServerName;
+            crConnectionInfo.DatabaseName = myconnectioninfo.DatabaseName;
+            crConnectionInfo.UserID = myconnectioninfo.UserID;
+            crConnectionInfo.Password = myconnectioninfo.Password;
+
+            CrTables = cryRpt.Database.Tables;
+
+
+            foreach (Table CrTable in CrTables)
+            {
+                crtableLogoninfo = CrTable.LogOnInfo;
+                crtableLogoninfo.ConnectionInfo = crConnectionInfo;
+                CrTable.ApplyLogOnInfo(crtableLogoninfo);
+            }
+
+            string path = @"\\10.29.7.29\sharing\";
+
+            bool exists = Directory.Exists(Server.MapPath(path));
+            if (!exists) {
+                Directory.CreateDirectory(Server.MapPath(path));
+            };
+
+            cryRpt.ExportToDisk(ExportFormatType.PortableDocFormat, path + "NO_CHIP-" + DocNo.Trim() + ".pdf");
+            cryRpt.Close();
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                return 1;
+            }
         }
     }
 }

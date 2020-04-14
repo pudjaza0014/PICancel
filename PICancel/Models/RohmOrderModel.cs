@@ -56,6 +56,9 @@ namespace PICancel.Models
         public string OrderNo { get; set; }
         public int OrderQty { get; set; }
         public int OrderQtyOrg { get; set; }
+        public string strRunNo1 { get; set; }
+        public string strRunNo2 { get; set; }
+        public string CategType { get; set; }
     }
 
 

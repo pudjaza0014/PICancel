@@ -89,9 +89,6 @@
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                         var OrderQty = oData.OrderQty;
                         var OrderNo = oData.OrderNo;
-
-                        //var PassParamEdit = '"data":"' + oData.ItemCode + '","Types":"' + SuplierCode + '"';
-                        //$(nTd).html("<input type='button' class='btn btn-sm btn-danger'>DELETE</button> ");
                         $(nTd).html("<input type='text' id='" + OrderNo + "' name='" + OrderNo +"' class='allowNumOnly form-control form-control-sm' value='" + OrderQty+"' />");
                     }
                 },
@@ -140,19 +137,39 @@
 
         $("#btnSave").on("click", function () {
             var DocNo;
+
+            var strMsg = "";
+            var intChk = 0;
+            if ($("#ddlType").val() == "") {
+                strMsg = "Please choose Type.";
+                intChk++;
+            }else
+            if (myTables.rows('.selected').data().length == 0) {
+                strMsg = "Please choose Data.";
+                intChk++;
+            } else
             if ($("#txtDocNo2").val() == "") {
+                strMsg = "Please Input RunNo.";
+                intChk++;
+            };
+            
+
+
+
+
+
+
+            if (intChk != 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: "Warning",
-                    text: "Please Input RunNo",
+                    text: strMsg,
                     type: 'warning',
-                });
+                }); 
                 return false;
             } else {
                 DocNo = $("#txtDocNo2").val();
-            };
-
-
+            }; 
             var oData = myTables.rows('.selected').data();
             var ItemCode = []
 
@@ -160,25 +177,25 @@
                 ItemCode.push({
                     "OrderNo": oData[i]["OrderNo"],
                     "OrderQtyOrg": oData[i]["OrderQtyOrg"],
-                    "OrderQty": $('#' + oData[i]["OrderNo"] + '').val()
+                    "OrderQty": $('#' + oData[i]["OrderNo"] + '').val(),
+                    "strRunNo1": $("#txtDocNo1").val(),
+                    "strRunNo2": DocNo,
+                    "CategType":"@ViewBag.Event",
                 });
             };
 
             $.ajax({
-            type: 'POST',
-            url: '@Url.Action("EntryNoChip", "Rohm")',
-                data: { dataRohmOrderQty: ItemCode, strRunNo:DocNo},
-            dataType: 'json',
-            success: function (citys) {
-                debugger
-            },
-            error: function (ex) {
-                alert('Failed to retrieve states.' + ex);
-            }
-        });
-            //var data = myTables.rows('.selected').$('input').serializeArray();
-
-
+                type: 'POST',
+                url: '@Url.Action("EntryNoChip", "Rohm")',
+                data: { dataRohmOrderQty: ItemCode},
+                dataType: 'json',
+                success: function (citys) {
+                    debugger
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                },
+            });
         });
 
 

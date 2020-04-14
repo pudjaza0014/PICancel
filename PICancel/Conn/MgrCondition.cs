@@ -1149,10 +1149,55 @@ namespace PICancel.Conn
         #endregion
 
 
-        #region Rohm Order Error Return
+        #region Rohm Order No Chip
+
+        public string OrderDeleteChangeRohm(string orderNo ,string DocNo ,string strCateg, int Condition, int OrderQty,int SeqNo, string OPID)
+        {
+            DataTable dt = new DataTable();
+            string Result = "";
+            string SQL = "";
+
+            try
+            {
+                SQL += " sprOrderDeleteChangRohm '"+ orderNo+ "','" + DocNo + "','" + strCateg + "','" + Condition + "','" + OrderQty + "','" + SeqNo + "','" + OPID + "';";
+                dt = objRun.GetDatatables(SQL,conTRPICancel);
+                
+                    Result = dt.Rows.Count == 0? "1": dt.Rows[0]["Msg"].ToString();
+                 
+            }
+            catch (Exception e)
+            {
+                Result = e.Message;
+            }
+
+            return Result;
+        }
 
 
 
+
+
+
+        public int GetCountCondition( string DocNo , int Condition)
+        {
+            DataTable dt = new DataTable();
+            int Result;
+            string SQL = ""; 
+            try
+            {
+                SQL += " select * from vewChangeRequestSheet Where DocNo = '"+ DocNo + "' and Condittion = '" + Condition + "' ";
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+
+                Result = dt.Rows.Count ;
+
+            }
+            catch (Exception e)
+            {
+                Result = 0;
+            }
+
+            return Result;
+        }
 
         #endregion
         #endregion
