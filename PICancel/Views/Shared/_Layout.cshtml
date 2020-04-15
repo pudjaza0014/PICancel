@@ -117,17 +117,18 @@
     </style>
 </head>
 <body id="page-top">
-    <div class="se-pre-con "></div> 
+    <div class="se-pre-con "></div>
+    <div class="se-pre-conF"></div>
     @{
         Html.RenderPartial("_partial/_partMenuControl");
-    } 
+    }
     <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content" >
+        <div id="content">
             @{
                 Html.RenderPartial("_partial/_PartHeader");
             }
 
-            <div class="container-fluid " >
+            <div class="container-fluid ">
                 @RenderBody()
             </div>
         </div>
@@ -193,7 +194,7 @@
             sessionStorage.clear();
         });
         $(document).ready(function () {
-            
+
             var interval = setInterval(function () {
                 var momentNow = moment();
                 $('#date-part').html(momentNow.format('DD MMM YYYY') + ' '
@@ -230,7 +231,7 @@
                         success: function (Data) {
                            if (Data.strboolbel == true && Data.strResult == "OK") {
                                 sessionStorage.clear();
-                               
+
                                window.open("@Url.Action("Login","Home")", '_blank');
                                 window.close();
                           }else {
@@ -275,7 +276,7 @@
                         success: function (Data) {
                            if (Data.strboolbel == true && Data.strResult == "OK") {
                                sessionStorage.clear();
-                              
+
                                 //window.close();
                           }else {
                                 $("#txtUserName").val("");

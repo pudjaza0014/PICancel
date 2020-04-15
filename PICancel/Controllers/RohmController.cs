@@ -182,6 +182,12 @@ namespace PICancel.Controllers
 
             }
             string Export = ExportReport(strDocNo);
+            if(Export != "")
+            {
+                _ResultLabel = false;
+                _Result = "Error";
+                _DataResult = Export;
+            } 
             var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = Export }, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
@@ -266,9 +272,9 @@ namespace PICancel.Controllers
                 };
                 cryRpt.ExportToDisk(ExportFormatType.PortableDocFormat, path + "NO_CHIP-" + DocNo.Trim() + ".pdf");
             cryRpt.Close();
-            return " ";
+            return "";
             }
-            catch (Exception e) { return e.Message; }
+            catch (Exception e) { return "ExportReport Error : " +e.Message; }
             //Response.Buffer = false;
             //Response.ClearContent();
             //Response.ClearHeaders();
