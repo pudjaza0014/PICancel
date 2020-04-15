@@ -151,13 +151,7 @@
             if ($("#txtDocNo2").val() == "") {
                 strMsg = "Please Input RunNo.";
                 intChk++;
-            };
-            
-
-
-
-
-
+            }; 
 
             if (intChk != 0) {
                 Swal.fire({
@@ -165,11 +159,11 @@
                     title: "Warning",
                     text: strMsg,
                     type: 'warning',
-                }); 
+                });
                 return false;
             } else {
                 DocNo = $("#txtDocNo2").val();
-            }; 
+            };
             var oData = myTables.rows('.selected').data();
             var ItemCode = []
 
@@ -189,8 +183,30 @@
                 url: '@Url.Action("EntryNoChip", "Rohm")',
                 data: { dataRohmOrderQty: ItemCode},
                 dataType: 'json',
-                success: function (citys) {
-                    debugger
+                success: function (Data) {
+                    if (Data.strboolbel == true && Data.strResult == "OK") { 
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: Data.dataLabel + Data.data,
+                            type: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                            @*.then(function () {
+                            var myWindow = window.open('@Url.Action("ExportReport", "Rohm")?DocNo=' + Data.data+'', "subWind", null, "POS");
+                            });*@
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: "Warning",
+                            text: Data.dataLabel,
+                            type: 'warning',
+                        })
+                        $("#framelblAlert").removeClass("alert alert-primary");
+                        $("#lblAlert").text("");
+                    };
                 },
                 error: function (ex) {
                     alert('Failed to retrieve states.' + ex);

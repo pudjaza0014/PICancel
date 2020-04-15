@@ -1141,7 +1141,7 @@ namespace PICancel.Conn
             string SQL = "";
 
 
-            SQL += "SELECT * FROM vewChangRohmRunningNo WHERE YYYYMMDD = '"+ DateTime.Now.ToString("yyyyMMdd")+ "' AND Type = '"+Type+"'"; 
+            SQL += "SELECT * FROM vewChangRohmRunningNo WHERE YYYYMMDD = '"+ DateTime.Now.ToString("yyyyMMdd")+ "' AND Type = '"+Type+ "' order by RunningNo desc"; 
             dt = objRun.GetDatatables(SQL, conTRPICancel);
 
             return dt;
@@ -1171,13 +1171,7 @@ namespace PICancel.Conn
             }
 
             return Result;
-        }
-
-
-
-
-
-
+        }  
         public int GetCountCondition( string DocNo , int Condition)
         {
             DataTable dt = new DataTable();
@@ -1188,7 +1182,7 @@ namespace PICancel.Conn
                 SQL += " select * from vewChangeRequestSheet Where DocNo = '"+ DocNo + "' and Condittion = '" + Condition + "' ";
                 dt = objRun.GetDatatables(SQL, conTRPICancel);
 
-                Result = dt.Rows.Count ;
+                Result = dt.Rows.Count;
 
             }
             catch (Exception e)
@@ -1197,6 +1191,26 @@ namespace PICancel.Conn
             }
 
             return Result;
+        }
+
+        public string getPurpose(string GroupCode ,string Code)
+        {
+            DataTable dt = new DataTable();
+            string strValue;
+            string SQL = "";
+            try
+            {
+                SQL += "select * from purpose where GroupCode = '" + GroupCode + "' and Code = '" + Code + "'";
+
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+
+                strValue = dt.Rows[0]["Value1"].ToString();
+            }
+            catch (Exception e)
+            {
+                strValue = e.Message;
+            }
+            return strValue;
         }
 
         #endregion
