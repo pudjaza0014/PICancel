@@ -19,6 +19,7 @@
                 <div class="form-group text-sm">
                     <label for="btnLink" class="font-weight-bold">Link To.</label>
                     <button id="btnLink" class=" btn btn-link"><span>PDF File</span></button>
+                  
                 </div>
                 <ul id="files"></ul>
             </div>
@@ -85,17 +86,26 @@
             }
         });
 
-        $("#btnLink").on("click", function () { 
-           
-            var thePath = "rthsrvvm/No-chip/";
-            var isChrome = !!window.chrome;
+        $("#btnLink").on("click", function () {  
+            //var thePath = "rthsrvvm/No-chip/";
+            //var isChrome = !!window.chrome;
 
-            if (isChrome === true) {
-                window.open('file:///' + thePath, '_blank');
-            } else {
-                window.open('file://' + thePath, 'explorer');
-            }
+            //if (isChrome === true) {
+            //    window.open('file://' + thePath, '_blank');
+            //} else {
+            //    window.open('file://' + thePath, 'explorer');
+            //}
 
+
+
+            var width = 800;
+            var height = 700;
+            var left = parseInt((screen.availWidth / 2) - (width / 2));
+            var top = parseInt((screen.availHeight / 2) - (height / 2));
+            var windowFeatures = "width=" + width + ",height=" + height +
+                ",status,resizable " +
+                ",scrollbars=yes"; 
+            var myWindow = window.open("file://rthsrvvm/No-chip", "subWind", windowFeatures, "POS");
         });
 
         $("#btnSearch").on("click", function () {

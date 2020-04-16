@@ -7,22 +7,22 @@
 <div class="user">
     <center>
         <div class="form-group">
-            <input type="text" class="form-control vw-100" id="txtUserName" aria-describedby="emailHelp" placeholder="Enter OPID..." required>
+            <input type="text" class="form-control vw-100" id="txtUserName" aria-describedby="emailHelp" placeholder="Enter OPID...">
         </div>
         <div class="form-group">
-            <input type="password" class="form-control " id="txtPassword" placeholder="Password" required>
+            <input type="password" class="form-control " id="txtPassword" placeholder="Password">
         </div>
         <button id="btnLogin" class="btn btn-primary btn-user  btn-block"> Login</button>
+
     </center>
 </div>
 
 @section Scripts    {
 
-<script>
+    <script>
 
         $(document).ready(function ()
         {
-
         var COMPUTERNAME = '@ViewBag.COMPUTERNAME';
         var USERNAME = '@ViewBag.USERNAME';
             sessionStorage.setItem("ssUSERNAME", USERNAME);
@@ -40,7 +40,8 @@
                     callback.call(this);
                 }
             }, 1000);
-    }
+        };
+
 
         $("#btnLogin").on("click", function () {
              $.ajax({
@@ -70,7 +71,7 @@
                                  text: err.message,
                                  type: 'error',
                              })
-                            
+
                          }
                         //window.location.href = "@Url.Action("Index")";
                     }
@@ -85,7 +86,7 @@
                             type: 'warning',
                         }).then(function () {
                             $("#txtUserName").focus();
-                            return ;
+                            return false;
                             });
                         }
                 },
@@ -111,24 +112,24 @@
                 }
             }
         });
-            $("#txtPassword").on("keypress", function (e) {
-                if (e.which == 13) {
-                    if (this.value == "") {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: "Warning",
-                            text: "Please Provide Password.",
-                            type: 'warning',
-                        })
-                        $("#txtPassword").focus();
-                        return false;
-                    } else {
-                        $("#btnLogin").click();
-                    }
+        $("#txtPassword").on("keypress", function (e) {
+            if (e.which == 13) {
+                if (this.value == "") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: "Warning",
+                        text: "Please Provide Password.",
+                        type: 'warning',
+                    })
+                    $("#txtPassword").focus();
+                    return false;
+                } else {
+                    $("#btnLogin").click();
                 }
+            }
 
         });
-</script>
+    </script>
 
 
 }

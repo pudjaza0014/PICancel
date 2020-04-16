@@ -1171,7 +1171,32 @@ namespace PICancel.Conn
             }
 
             return Result;
-        }  
+        }
+
+        public string OrderHideSimulationtrans(string orderNo)
+        {
+            DataTable dt = new DataTable();
+            string Result = "";
+            string SQL = "";
+
+            try
+            {
+                SQL += " sprSimulationResultTrans '" + orderNo + "';";
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+
+                Result = dt.Rows.Count == 0 ? "1" : dt.Rows[0]["Msg"].ToString();
+
+            }
+            catch (Exception e)
+            {
+                Result = e.Message;
+            }
+
+            return Result;
+        }
+
+
+
         public int GetCountCondition( string DocNo , int Condition)
         {
             DataTable dt = new DataTable();

@@ -42,17 +42,17 @@
             </table>
         </div>
         <buton class="btn btn-success" id="btnSave" style="min-width:7vw"><i class="fas fa-save"></i> Save</buton>
-        <buton class="btn btn-danger" id="btnSave"><i class="fas fa-trash-alt"></i> Delete</buton>
+        <buton class="btn btn-danger" id="btnDel"><i class="fas fa-trash-alt"></i> Delete</buton>
     </div>
 </div>
 
 <script>
     var myTables;
-
-
+    var ItemCode = [];
+    var DocNo;
     function GetdataTables() {
 
-
+        // #region GetDataTable
 
         myTables = $('#tbNoChip').DataTable({
             scrollY: "200px",
@@ -129,18 +129,17 @@
         });
 
 
+        // #endregion
 
-
-
-
+        //#region btnSave
 
 
         $("#btnSave").on("click", function () {
 
             $(".se-pre-conF").fadeIn("slow");
 
-            var DocNo;
 
+            DocNo = null;
             var strMsg = "";
             var intChk = 0;
             if ($("#ddlType").val() == "") {
@@ -169,46 +168,9 @@
                 DocNo = $("#txtDocNo2").val();
             };
 
-
-
-            var oData = myTables.rows('.selected').data();
-            var ItemCode = []
-
-            for (var i = 0; i < oData.length; i++) {
-                var vorderqty = $('#' + oData[i]["OrderNo"] + '').val();
-                if (parseInt(oData[i]["OrderQtyOrg"]) < parseInt(vorderqty)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Warning",
-                        html: '<b>"OrderQty Must be less than or equal to OrderQtyOrg."</b> ' +
-                            '<p><small class="form-text text-muted" >OrderQty ต้องน้อยกว่า Original OrderQty</small> </p> ' +
-                            'OrderNo : ' + oData[i]["OrderNo"] + '  ' +
-                            '<br/><span class="text-danger"> Please checking Selected item again. </span>',
-                        type: 'warning',
-                    });
-                    ItemCode = null;
-                    $(".se-pre-conF").fadeOut("slow");
-                    return false;
-                    break;
-
-
-                };
-
-
-
-
-
-
-                ItemCode.push({
-                    "OrderNo": oData[i]["OrderNo"],
-                    "OrderQtyOrg": oData[i]["OrderQtyOrg"],
-                    "OrderQty": $('#' + oData[i]["OrderNo"] + '').val(),
-                    "strRunNo1": $("#txtDocNo1").val(),
-                    "strRunNo2": DocNo,
-                    "CategType":"@ViewBag.Event",
-                });
-            };
-
+            if (!GetDataSelected()) {
+                return false;
+            }
             $.ajax({
                 type: 'POST',
                 url: '@Url.Action("EntryNoChip", "Rohm")',
@@ -236,19 +198,133 @@
                             title: "Warning",
                             text: Data.dataLabel,
                             type: 'warning',
-                        })   
+                        })
                     };
                 },
                 error: function (ex) {
                     $(".se-pre-conF").fadeOut("slow");
                     alert('Failed to retrieve states.' + ex);
                 },
-                });
+            });
 
         });
 
+        //#endregion
+
+
+        $("#btnDel").on("click", function () {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function (result) {
+                if (!result.value) {
+                    return false;
+                } else {
+                    var strMsg = "";
+                    var intChk = 0;
+                    if ($("#ddlType").val() == "") {
+                        strMsg = "Please choose Type.";
+                        intChk++;
+                    } else
+                        if (myTables.rows('.selected').data().length == 0) {
+                            strMsg = "Please choose Data.";
+                            intChk++;
+                        };
+                    if (intChk != 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: "Warning",
+                            text: strMsg,
+                            type: 'warning',
+                        });
+                        $(".se-pre-conF").fadeOut("slow");
+                        return false;
+                    };
+                    if (!GetDataSelected()) {
+                        return false;
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteNoChip", "Rohm")',
+                        data: { dataRohmOrderQty: ItemCode },
+                        dataType: 'json',
+                        success: function (Data) {
+                            if (Data.strboolbel == true && Data.strResult == "OK") {
+                                $(".se-pre-conF").fadeOut("slow");
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: Data.dataLabel + Data.data,
+                                    type: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                })
+                                    .then(function () {
+                                        $("#btnClear").click();
+                                    });
+                            }
+                            else {
+                                $(".se-pre-conF").fadeOut("slow");
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                });
+                            };
+                        },
+                        error: function (ex) {
+                            $(".se-pre-conF").fadeOut("slow");
+                            alert('Failed to retrieve states.' + ex);
+                        },
+                    });
+                }
+            });
+        });
 
     }
+
+    function GetDataSelected() {
+        var oData = myTables.rows('.selected').data();
+       for (var i = 0; i < oData.length; i++) {
+           var vorderqty = $('#' + oData[i]["OrderNo"] + '').val();
+           if (parseInt(oData[i]["OrderQtyOrg"]) < parseInt(vorderqty)) {
+               Swal.fire({
+                   icon: 'error',
+                   title: "Warning",
+                   html: '<b>"OrderQty Must be less than or equal to OrderQtyOrg."</b> ' +
+                       '<p><small class="form-text text-muted" >OrderQty ต้องน้อยกว่า Original OrderQty</small> </p> ' +
+                       'OrderNo : ' + oData[i]["OrderNo"] + '  ' +
+                       '<br/><span class="text-danger"> Please checking Selected item again. </span>',
+                   type: 'warning',
+               });
+               ItemCode = null;
+               $(".se-pre-conF").fadeOut("slow");
+               return false;
+               break;
+
+           };
+           ItemCode.push({
+               "OrderNo": oData[i]["OrderNo"],
+               "OrderQtyOrg": oData[i]["OrderQtyOrg"],
+               "OrderQty": $('#' + oData[i]["OrderNo"] + '').val(),
+               "strRunNo1": $("#txtDocNo1").val(),
+               "strRunNo2": DocNo,
+               "CategType":"@ViewBag.Event",
+           });
+
+        };
+
+        return true;
+    };
+
+
+
     function DrawDatatoTable(Data) {
         try {
             myTables.rows.add(Data.data).draw();

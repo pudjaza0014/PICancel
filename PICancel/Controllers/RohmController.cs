@@ -84,9 +84,7 @@ namespace PICancel.Controllers
             }
             return Json(new MultiSelectList(listItems, "Value", "Text"));
         }
-
-
-
+         
         public JsonResult GetDataListNoChip(RohmOrderControl dataArr, string _WKstatus)
         {
             string _Result = "OK";
@@ -125,8 +123,7 @@ namespace PICancel.Controllers
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
-
-
+         
         public JsonResult EntryNoChip(List<RohmOrderQty> dataRohmOrderQty)
         {
             string _Result = "OK";
@@ -182,83 +179,150 @@ namespace PICancel.Controllers
 
             }
             string Export = ExportReport(strDocNo);
-            if(Export != "")
+            if (Export != "")
             {
                 _ResultLabel = false;
                 _Result = "Error";
                 _DataResult = Export;
-            } 
+            }
             var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = Export }, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
 
+        public JsonResult DeleteNoChip(List<RohmOrderQty> dataRohmOrderQty)
+        {
+            string _Result = "OK";
+            string _strRunNo = "";
+            string strDocNo = dataRohmOrderQty[0].strRunNo1 + dataRohmOrderQty[0].strRunNo2;
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+            int Seqno = 1;
+            dt = new DataTable();
+            List<RohmOrderNOChip> OrderNoChipList = new List<RohmOrderNOChip>();
+            try
+            {
+                string DataResult;
+                foreach (RohmOrderQty Dataitem in dataRohmOrderQty)
+                {
+                    //_strRunNo = Convert.ToString(Convert.ToInt32(Dataitem.strRunNo2.Trim())).PadLeft(3, '0');
+                    string _orderNo = Dataitem.OrderNo;
+                    int _orderQty = Dataitem.OrderQty;
+                    int _originQty = Dataitem.OrderQtyOrg;
+                    string strRunNo1 = Dataitem.strRunNo1;
+                    string strCagte = Dataitem.CategType;
+                    int Condition = 2;
+                    if (_originQty != _orderQty)
+                    {
+                        Condition = 3;
+                    }
+                    else
+                    {
+                        _orderQty = 0;
+                    }
+
+                    DataResult = objrun.OrderHideSimulationtrans(_orderNo);
+
+                    if (DataResult != "0")
+                    {
+                        _ResultLabel = false;
+                        _Result = "Error";
+                        _DataResult = (DataResult == "1" ? "Error sprSimulationResultTrans '" + _orderNo + "' " : DataResult) + "Please Contact IS. 4611 , 4612";
+                        break;
+                    }
+                    else
+                    {
+                        Seqno++;
+                    }
+
+                }
+
+                _DataResult = Seqno - 1 == dataRohmOrderQty.Count ? "Success" : "Error";
+
+            }
+            catch (Exception e)
+            {
+
+            }
+            string Export = "";//ExportReport(strDocNo);
+            if (Export != "")
+            {
+                _ResultLabel = false;
+                _Result = "Error";
+                _DataResult = Export;
+            }
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = Export }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+ 
         public string ExportReport(string DocNo)
         {
-            try {
-            ConnectionInfo myconnectioninfo = new ConnectionInfo();
-            ConnectionStringSettings ConnectionStringSettings = ConfigurationManager.ConnectionStrings["TRPIConnectionString"];
-            var connectionStringPieces = ConnectionStringSettings.ConnectionString.Split(';');
-            foreach (string connectionStringPiece in connectionStringPieces)
+            try
             {
-                string[] connectionSubPieces = connectionStringPiece.Split('=');
-
-                string key = connectionSubPieces[0].ToLower();
-                string value = connectionSubPieces[1];
-                switch (key)
+                ConnectionInfo myconnectioninfo = new ConnectionInfo();
+                ConnectionStringSettings ConnectionStringSettings = ConfigurationManager.ConnectionStrings["TRPIConnectionString"];
+                var connectionStringPieces = ConnectionStringSettings.ConnectionString.Split(';');
+                foreach (string connectionStringPiece in connectionStringPieces)
                 {
-                    case "data source":
-                        myconnectioninfo.ServerName = value;
-                        break;
-                    case "server":
-                        myconnectioninfo.ServerName = value;
-                        break;
-                    case "initial catalog":
-                        myconnectioninfo.DatabaseName = value;
-                        break;
-                    case "user id":
-                        myconnectioninfo.UserID = value;
-                        break;
-                    case "password":
-                        myconnectioninfo.Password = value;
-                        break;
-                    case "pwd":
-                        myconnectioninfo.Password = value;
-                        break;
-                } 
-            }
+                    string[] connectionSubPieces = connectionStringPiece.Split('=');
 
-            ReportDocument cryRpt = new ReportDocument();
-            TableLogOnInfo crtableLogoninfo = new TableLogOnInfo();
-            ConnectionInfo crConnectionInfo = new ConnectionInfo();
-            Tables CrTables;
-            // cryRpt.Load(Path.Combine(Server.MapPath("~/Report"), "RptOrderChang.rpt"));
-            cryRpt.Load(Path.Combine(Server.MapPath("~/Report"), "RptOrderChang.rpt"));
+                    string key = connectionSubPieces[0].ToLower();
+                    string value = connectionSubPieces[1];
+                    switch (key)
+                    {
+                        case "data source":
+                            myconnectioninfo.ServerName = value;
+                            break;
+                        case "server":
+                            myconnectioninfo.ServerName = value;
+                            break;
+                        case "initial catalog":
+                            myconnectioninfo.DatabaseName = value;
+                            break;
+                        case "user id":
+                            myconnectioninfo.UserID = value;
+                            break;
+                        case "password":
+                            myconnectioninfo.Password = value;
+                            break;
+                        case "pwd":
+                            myconnectioninfo.Password = value;
+                            break;
+                    }
+                }
 
-            cryRpt.SetParameterValue("DocNo", DocNo);
-            cryRpt.SetParameterValue("DocNo", DocNo.Trim());
-            cryRpt.SetParameterValue("Condition-2", objrun.GetCountCondition(DocNo.Trim(), 2));
-            cryRpt.SetParameterValue("Condition-3", objrun.GetCountCondition(DocNo.Trim(), 3));
+                ReportDocument cryRpt = new ReportDocument();
+                TableLogOnInfo crtableLogoninfo = new TableLogOnInfo();
+                ConnectionInfo crConnectionInfo = new ConnectionInfo();
+                Tables CrTables;
+                // cryRpt.Load(Path.Combine(Server.MapPath("~/Report"), "RptOrderChang.rpt"));
+                cryRpt.Load(Path.Combine(Server.MapPath("~/Report"), "RptOrderChang.rpt"));
 
-            crConnectionInfo.ServerName = myconnectioninfo.ServerName;
-            crConnectionInfo.DatabaseName = myconnectioninfo.DatabaseName;
-            crConnectionInfo.UserID = myconnectioninfo.UserID;
-            crConnectionInfo.Password = myconnectioninfo.Password;
+                cryRpt.SetParameterValue("DocNo", DocNo);
+                cryRpt.SetParameterValue("DocNo", DocNo.Trim());
+                cryRpt.SetParameterValue("Condition-2", objrun.GetCountCondition(DocNo.Trim(), 2));
+                cryRpt.SetParameterValue("Condition-3", objrun.GetCountCondition(DocNo.Trim(), 3));
 
-            CrTables = cryRpt.Database.Tables;
+                crConnectionInfo.ServerName = myconnectioninfo.ServerName;
+                crConnectionInfo.DatabaseName = myconnectioninfo.DatabaseName;
+                crConnectionInfo.UserID = myconnectioninfo.UserID;
+                crConnectionInfo.Password = myconnectioninfo.Password;
+
+                CrTables = cryRpt.Database.Tables;
 
 
-            foreach (Table CrTable in CrTables)
-            {
-                crtableLogoninfo = CrTable.LogOnInfo;
-                crtableLogoninfo.ConnectionInfo = crConnectionInfo;
-                CrTable.ApplyLogOnInfo(crtableLogoninfo);
-            }
+                foreach (Table CrTable in CrTables)
+                {
+                    crtableLogoninfo = CrTable.LogOnInfo;
+                    crtableLogoninfo.ConnectionInfo = crConnectionInfo;
+                    CrTable.ApplyLogOnInfo(crtableLogoninfo);
+                }
 
 
                 string path = objrun.getPurpose("path", "PTH0001");
 
-            //string path =(@"\\10.29.7.124\Sharing\");
+                //string path =(@"\\10.29.7.124\Sharing\");
 
                 //bool exists = Directory.Exists(Server.MapPath(path));
                 //if (!exists)
@@ -271,10 +335,10 @@ namespace PICancel.Controllers
                     Directory.CreateDirectory(path);
                 };
                 cryRpt.ExportToDisk(ExportFormatType.PortableDocFormat, path + "NO_CHIP-" + DocNo.Trim() + ".pdf");
-            cryRpt.Close();
-            return "";
+                cryRpt.Close();
+                return "";
             }
-            catch (Exception e) { return "ExportReport Error : " +e.Message; }
+            catch (Exception e) { return "ExportReport Error : " + e.Message; }
             //Response.Buffer = false;
             //Response.ClearContent();
             //Response.ClearHeaders();
