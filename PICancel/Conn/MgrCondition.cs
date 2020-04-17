@@ -754,6 +754,7 @@ namespace PICancel.Conn
         #endregion
 
         #region GOIInquiry
+
         public OGIInquiryResult GetDataOGIInquiry(OGIInquiryCondition DataCondition)
         {
             dt = new DataTable();
@@ -1239,6 +1240,174 @@ namespace PICancel.Conn
         }
 
         #endregion
+
+        #region Rohm Inquiry
+
+        public DataTable GetRohmCatgType()
+        {
+            string SQL = "";
+
+            try
+            {
+                SQL = "select CategType from vewChangeRequestSheetCateg";
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+                return dt;
+            }
+            catch (Exception e)
+            {
+                string ErrMgs;
+                ErrMgs = e.Message;
+            }
+
+            return dt;
+        }
+ public DataTable GetRohmIquiryType()
+        {
+            string SQL = "";
+
+            try
+            {
+                SQL = "select Type from vewChangeRequestSheetType";
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+                return dt;
+            }
+            catch (Exception e)
+            {
+                string ErrMgs;
+                ErrMgs = e.Message;
+            }
+
+            return dt;
+        }
+
+        public RohmInqGrp GetDataInquiryList(RohmInquiryControl dataArr)
+        {
+            string SQL = "";
+            int Chkint = 0;
+            RohmInqGrp grpListDataDetail = new RohmInqGrp();
+            //List<RohmOrderError> OrderErrorList = new List<RohmOrderError>();
+            List<RohmOrderInquiry> OrderNoChipList = new List<RohmOrderInquiry>();
+            try
+            {
+
+                //dt = objRun.GetDatatables(getRohmInquiryString(dataArr), conTRPICancel); 
+                dt = GetdtInquiryList(dataArr);
+                if (dt.Rows.Count != 0)
+                {
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        OrderNoChipList.Add(new RohmOrderInquiry()
+                        {
+                            No = row["Nbr"].ToString().Trim(),
+                            CategType = row["CategType"].ToString().Trim(),
+                            DocNo = row["DocNo"].ToString().Trim(),
+                            OrderNo = row["OrderNo"].ToString().Trim(),
+                            Type = row["Type"].ToString().Trim(),
+                            ProductCode = row["ProductCode"].ToString().Trim(),
+                            RohmLine = row["RohmLine"].ToString().Trim(),
+                            InputDate = row["InputDate"].ToString().Trim(),
+                            Message = row["Message"].ToString().Trim(), 
+                        }); 
+                    }
+                }
+                if (OrderNoChipList.Count() != 0)
+                {
+                    grpListDataDetail.strresult = "OK";
+                    grpListDataDetail.blStatus = true;
+                    grpListDataDetail.DataList = OrderNoChipList.ToList();
+                }
+                else
+                {
+                    grpListDataDetail.strresult = "Data not found";
+                    grpListDataDetail.blStatus = false;
+                    grpListDataDetail.DataList = null;
+                }
+            }
+            catch (Exception e)
+            {
+                grpListDataDetail.strresult = e.Message;
+                grpListDataDetail.blStatus = false;
+                grpListDataDetail.DataList = null;
+            }
+
+            return grpListDataDetail;
+        }
+
+
+
+
+        public DataTable GetdtInquiryList(RohmInquiryControl dataArr)
+        {
+            dt = objRun.GetDatatables(getRohmInquiryString(dataArr), conTRPICancel);
+            return dt;
+        }
+
+        public string getRohmInquiryString(RohmInquiryControl _Data)
+        {
+            string SQL = "";
+            int Chkint = 0;
+            SQL += "Select * From vewChangeRequestSheet";
+            if (_Data.CategType != "" && _Data.CategType != null)                 //Lotno
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "CategType = '" + _Data.CategType + "'";
+                Chkint++;
+            }
+            if (_Data.DocNo != "" && _Data.DocNo != null)             //Line
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "DocNo = '" + _Data.DocNo + "'";
+                Chkint++;
+            }
+            if (_Data.Type != "" && _Data.Type != null)             //type
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "Type = '" + _Data.Type + "'";
+                Chkint++;
+            }
+            if (_Data.OrderNo != "" && _Data.OrderNo != null)//ProductCode
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "OrderNo = '" + _Data.OrderNo + "'";
+                Chkint++;
+            }
+            if (_Data.StartTime != null && _Data.EndTime != null)    //StartTime - EndTime
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "Inputdate BETWEEN '" + Convert.ToDateTime(_Data.StartTime).ToString("yyyyMMdd") + "'AND '" + Convert.ToDateTime(_Data.EndTime).ToString("yyyyMMdd") + "'";
+                Chkint++;
+            }
+            else if (_Data.StartTime != null && _Data.EndTime == null)   //StartTime
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "Inputdate >= '" + Convert.ToDateTime(_Data.StartTime).ToString("yyyyMMdd") + "'";
+                Chkint++;
+            }
+            else if (_Data.StartTime == null && _Data.EndTime != null)      //EndTime
+            {
+                SQL += Chkint == 0 ? " Where " : " And ";
+                SQL += "Inputdate <='" + Convert.ToDateTime(_Data.EndTime).ToString("yyyyMMdd") + "'";
+                Chkint++;
+            }
+            //if (_Data.CancelBy != "" && _Data.CancelBy != null)     //CancelBy
+            //{
+            //    SQL += Chkint == 0 ? " Where " : " And ";
+            //    SQL += "Cancelby = '" + _Data.CancelBy + "'";
+            //    Chkint++;
+            //}
+            //if (_Data.cancelCode != "" && _Data.cancelCode != null)//cancelCode
+            //{
+            //    SQL += Chkint == 0 ? " Where " : " And ";
+            //    SQL += "cancelCode = '" + _Data.cancelCode + "'";
+            //    Chkint++;
+            //}
+            return SQL;
+        }
+
+        #endregion
+
+
         #endregion
 
 

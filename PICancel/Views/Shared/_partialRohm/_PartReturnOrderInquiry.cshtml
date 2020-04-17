@@ -1,3 +1,175 @@
-﻿<div class="container-fluid"> 
-    <h1>OK</h1>
+﻿<div class="container-fluid">
+    <div>
+        <div class="row mt-4">
+            <div class="col-lg-3">
+                <label for="ddlCategory" class="font-weight-bold">Category.</label>
+                @Html.DropDownList("ddlCategory", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlCategory", @class = " form-control form-control-sm", width = "300px" })
+            </div>
+            <div class="col-lg-3">
+                <label for="txtDocNo" class="font-weight-bold">DocNo.</label>
+                @Html.TextBox("txtDocNo", "", new { @class = "form-control form-control-sm ", @id = "txtDocNo", @placeholder = "DocNo" })
+            </div>
+            @*</div>
+            <div class="row">*@
+            <div class="col-lg-3">
+                <label for="ddlType" class="font-weight-bold">Type.</label>
+                @Html.DropDownList("ddlType", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlType", @class = " form-control form-control-sm", width = "300px" })
+            </div>
+            <div class="col-lg-3">
+                <label for="txtOrder" class="font-weight-bold">Order.</label>
+                @Html.TextBox("txtOrder", "", new { @class = "form-control form-control-sm ", @id = "txtOrder", @placeholder = "Order" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <label for="txtStartDate" class="font-weight-bold">Input Date From.</label>
+                @Html.TextBox("txtStartDate", "", new { @class = "form-control form-control-sm datepikers", @id = "txtStartDate", @placeholder = "Date" })
+            </div>
+            <div class="col-lg-3">
+                <label for="txtEndDate" class="font-weight-bold">Date to.</label>
+                @Html.TextBox("txtEndDate", "", new { @class = "form-control form-control-sm datepikers", @id = "txtEndDate", @placeholder = "EndDate" })
+            </div>
+        </div>
+        <div class="row  mt-4">
+            <div class=" col-lg">
+                <div class="form-group">
+                    <buton class="btn btn-info " style="min-width:10vw" id="btnSearch"><i class="fas fa-search"></i> Search</buton>
+                    <buton class="btn btn-secondary" id="btnClear"><i class="fas fa-sync"></i> Clear</buton>
+                </div>
+                <hr />
+            </div>
+        </div>
+        @{
+            Html.RenderPartial("_partialRohm/_PartTableOrderInquiry");
+        }
+    </div>
 </div>
+
+
+<script>
+
+    function GetCategType() {
+
+         $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetCategType", "Rohm")',
+           // data: { _WKstatus: "@ViewBag.Event" },
+            dataType: 'json',
+            success: function (citys) {
+                if (citys.length != 0) {
+                    $.each(citys, function (i, city) {
+                        $("#ddlCategory").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                    });
+                }
+            },
+            error: function (ex) {
+                alert('Failed to retrieve states.' + ex);
+            }
+        });
+
+
+
+
+    }
+    function GetRohmIquiryType() {
+
+         $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetRohmIquiryType", "Rohm")',
+           // data: { _WKstatus: "@ViewBag.Event" },
+            dataType: 'json',
+            success: function (citys) {
+                if (citys.length != 0) {
+                    $.each(citys, function (i, city) {
+                        $("#ddlType").append('<option value="' + city.Value + '">' + city.Text + '</option>');
+                    });
+                }
+            },
+            error: function (ex) {
+                alert('Failed to retrieve states.' + ex);
+            }
+        });
+        GetInit();
+    }
+
+
+    function GetInit() {
+
+        $("#btnSearch").on("click", function () {
+           debugger
+            dataArry = [{
+                CategType: $("#ddlCategory").val(),
+                DocNo: $("#txtDocNo").val(),
+                Type: $("#ddlType").val(),
+                OrderNo: $("#txtOrder").val(),
+                StartDate: $("#txtStartDate").val(),
+                EndDate: $("#txtEndDate").val() 
+            }];
+            GetDatatoTable(dataArry);
+            $("#divDocNo").css("display", "inline-block")
+
+        });
+    }
+
+    function GetDatatoTable(dataArry) {
+        $.ajax({
+            type: 'POST',
+                url: '@Url.Action("GetRohmInquiryList", "Rohm")',
+            data: { dataArr: dataArry[0]},
+            dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+                        DrawDatatoTable(Data); 
+                    }
+                        else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+
+                                return false;
+                            }
+                            else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                });
+                                $("#txtDocNo1").val("")
+                                $("#txtDocNo2").val("")
+                            }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+    }
+
+    function downloadDataDetail4Item() { 
+              var width = 800;
+            var height = 700;
+            var left = parseInt((screen.availWidth / 2) - (width / 2));
+            var top = parseInt((screen.availHeight / 2) - (height / 2));
+            var windowFeatures = "width=" + width + ",height=" + height +
+                ",status,resizable " +
+                ",scrollbars=yes"; 
+
+            if (myTables.rows().count() == 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Data not found",
+                    type: 'warning',
+                })
+                return false;
+            } else {
+            var myWindow = window.open('@Url.Action("GetDataExportToExcel", "Rohm")', "subWind", windowFeatures, "POS");
+            }
+        }
+
+</script>

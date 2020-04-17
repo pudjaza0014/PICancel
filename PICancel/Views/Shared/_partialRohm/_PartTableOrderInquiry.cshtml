@@ -1,1 +1,130 @@
-﻿
+﻿<div class="row">
+    <div class=" col-lg">
+        <div class="table-responsive-lg text-center">
+            <table id="tbNoChip" class="table table-bordered table-striped table-sm nowrap w-100  ">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>CategType</th>
+                        <th>DocNo</th>
+                        <th>OrderNo</th>
+                        <th>Type</th>
+                        <th>ProductCode</th>
+                        <th>RohmLine</th>
+                        <th>InputDate</th>
+                        <th>Message</th>
+                        <th>Report</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th>No</th>
+                        <th>CategType</th>
+                        <th>DocNo</th>
+                        <th>OrderNo</th>
+                        <th>Type</th>
+                        <th>ProductCode</th>
+                        <th>RohmLine</th>
+                        <th>InputDate</th>
+                        <th>Message</th>
+                        <th>Report</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    var myTables;
+    var ItemCode = [];
+    var DocNo;
+    function GetdataTables() {
+
+        // #region GetCategType
+
+
+
+
+        // #endregion
+
+
+        // #region GetDataTable
+
+        myTables = $('#tbNoChip').DataTable({
+            scrollY: "200px",
+            paging: false,
+            processing: true,
+            deferRender: true,
+            //dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            //dom: '<"top"B>rt<"bottom"ip><"clear">',//มี Buttons ,ไม่มีแบ่งpage บนหัว Table
+            columns: [
+                { data: 'No' },
+                { data: 'CategType' },
+                { data: 'DocNo' },
+                { data: 'OrderNo' },
+                { data: 'Type' },
+                { data: 'ProductCode' },
+                { data: 'RohmLine' },
+                { data: 'InputDate' },
+                { data: 'Message' }, 
+                {
+                    data: 'DocNo', 
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        var DocNo = oData.DocNo;
+                        var OrderNo = oData.OrderNo;
+                       // $(nTd).html("<button class='btn btn-info  btn-sm'  onclick=''>View</button>");
+                        $(nTd).html("<a href='@Url.Action("ExportReportInquiry")?DocNo=" + DocNo +"'> Report PDF </a>");
+                    }
+                }, 
+            ],
+            buttons: [
+                {
+                    text: '<i class="fa fa-download"></i> Export excel.csv',
+                    className: '  Button btn btn-success btn-sm',
+                    action: function (e, dt, node, config) {
+                        downloadDataDetail4Item();
+                    }
+                }
+            ],  
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+
+        // #endregion
+
+
+
+    }
+
+    function DrawDatatoTable(Data) {
+        try {
+            myTables.rows.add(Data.data).draw();
+           // myTables.rows().select();
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: Data.dataLabel,
+                type: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } catch (e) {
+            Swal.fire({
+                icon: 'warning',
+                title: "warning",
+                text: e.Message,
+                type: 'warning',
+            })
+        }
+    };
+
+
+</script>

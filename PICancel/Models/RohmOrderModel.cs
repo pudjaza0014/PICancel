@@ -19,6 +19,8 @@ namespace PICancel.Models
         public string OrderNo { get; set; }
     }
 
+   
+
     public class RohmOrderNOChip
     {
         public string No { get; set; }
@@ -59,6 +61,37 @@ namespace PICancel.Models
         public string strRunNo1 { get; set; }
         public string strRunNo2 { get; set; }
         public string CategType { get; set; }
+    }
+
+    public class RohmInquiryControl
+    {
+        public string CategType { get; set; }
+        public string DocNo { get; set; }
+        public string Type { get; set; }
+        public string OrderNo { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
+    }
+
+    public class RohmOrderInquiry
+    {
+        public string No { get; set; }
+        public string CategType { get; set; }
+        public string DocNo { get; set; }
+        public string OrderNo { get; set; }
+        public string Type { get; set; }
+        public string ProductCode { get; set; }
+        public string RohmLine { get; set; }
+        public string InputDate { get; set; }
+        public string Message { get; set; }
+        //public string View { get; set; } 
+    }
+
+    public class RohmInqGrp
+    {
+        public Boolean blStatus { get; set; }
+        public string strresult { get; set; }
+        public List<RohmOrderInquiry> DataList { get; set; }
     }
 
 

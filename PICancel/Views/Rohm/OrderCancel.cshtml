@@ -47,23 +47,23 @@
                 maxDate: new Date()
             }).data('datepicker');
 
-            if ("@ViewBag.Event" != "NoChip") {
-
+            if ("@ViewBag.Event" != "NoChip") { 
                 $("#divLink").css("display", "none");
             } 
             if ("@ViewBag.Event" != "Inquiry") { 
                 GetCancelOperator();
+
+            } 
+            if ("@ViewBag.Event" == "Inquiry") { 
+                GetCategType(); 
+                GetRohmIquiryType();
             } 
             GetdataTables();
         } 
         $("#btnClear").on("click", function () {
             myFunction();
         });
-
-
-
-
-
+         
 
     </script>
 }
