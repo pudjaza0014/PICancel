@@ -1263,8 +1263,7 @@ namespace PICancel.Conn
         }
  public DataTable GetRohmIquiryType()
         {
-            string SQL = "";
-
+            string SQL = ""; 
             try
             {
                 SQL = "select Type from vewChangeRequestSheetType";
