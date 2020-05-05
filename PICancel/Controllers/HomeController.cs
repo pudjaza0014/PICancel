@@ -25,9 +25,9 @@ namespace PICancel.Controllers
         {
             Session["OPID"] = null;
             Session["USERNAME"] = null;
-            string PCName1 = Dns.GetHostEntry(Request.ServerVariables["REMOTE_ADDR"]).HostName; 
-            Session["COMPUTERNAME"] = PCName1.Replace(".rist.local", "").ToUpper();
-            
+            //string PCName1 = Dns.GetHostEntry(Request.ServerVariables["REMOTE_ADDR"]).HostName; 
+            //Session["COMPUTERNAME"] = PCName1.Replace(".rist.local", "").ToUpper();
+            Session["COMPUTERNAME"] = "";
             ViewBag.USERNAME = Session["COMPUTERNAME"]; 
             ViewBag.Title = "TRDI CANCEL CONTROL MENU";
             return View();
@@ -99,8 +99,9 @@ namespace PICancel.Controllers
             {
                 return View("Login");
             }
-            string PCName1 = Dns.GetHostEntry(Request.ServerVariables["REMOTE_ADDR"]).HostName;  
-            Session["COMPUTERNAME"] = PCName1.Replace(".rist.local", "").ToUpper(); 
+            //string PCName1 = Dns.GetHostEntry(Request.ServerVariables["REMOTE_ADDR"]).HostName;  
+            //Session["COMPUTERNAME"] = PCName1.Replace(".rist.local", "").ToUpper(); 
+            Session["COMPUTERNAME"] = "";
             ViewBag.USERNAME = Session["USERNAME"];
             ViewBag.COMPUTERNAME = Session["COMPUTERNAME"];
             ViewBag.Title = "TRDI CANCEL CONTROL MENU";

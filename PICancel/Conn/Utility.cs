@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using System.Data.OleDb;
 
-namespace MCMonitoring.Conn
+namespace PICancel.Conn
 {
     public class Utility
     {
@@ -36,6 +36,38 @@ namespace MCMonitoring.Conn
 
 
             return dt;
+        }
+
+        public static DataSet ConvertCSVtoDataSet(string strFilePath)
+        {
+            DataTable dt = new DataTable();
+            DataSet ds = new DataSet();
+            using (StreamReader sr = new StreamReader(strFilePath))
+            {
+                string[] headers = sr.ReadLine().Split(',');
+                foreach (string header in headers)
+                {
+                    dt.Columns.Add(header);
+                }
+
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = sr.ReadLine().Split(',');
+                    if (rows.Length > 1)
+                    {
+                        DataRow dr = dt.NewRow();
+                        for (int i = 0; i < headers.Length; i++)
+                        {
+                            dr[i] = rows[i].Trim();
+                        }
+                        dt.Rows.Add(dr);
+                    }
+                }
+
+            }
+
+            ds.Tables.Add(dt);
+            return ds;
         }
 
         public static DataTable ConvertXSLXtoDataTable(string strFilePath, string connString)
@@ -91,7 +123,7 @@ namespace MCMonitoring.Conn
                     for (int i = 0; i < Sheets.Rows.Count; i++)
                     {
                         string worksheets = Sheets.Rows[i]["TABLE_NAME"].ToString();
-                        OleDbCommand cmd = new OleDbCommand(String.Format("SELECT * FROM [{0}]", worksheets), oledbConn);
+                        OleDbCommand cmd = new OleDbCommand(string.Format("SELECT * FROM [{0}]", worksheets), oledbConn);
                         OleDbDataAdapter oleda = new OleDbDataAdapter();
                         oleda.SelectCommand = cmd;
 

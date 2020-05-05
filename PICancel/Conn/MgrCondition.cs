@@ -32,7 +32,7 @@ namespace PICancel.Conn
                 SQL = "SELECT * FROM [TRPICancel].[dbo].[vewOperator] ";
                 SQL += "WHERE OPCode ='" + OPID + "' ";
                 SQL += "AND OPPassword = '" + Password + "';";
-                dt = objRun.GetDatatables(SQL, conTRPI);
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
 
                 if (dt.Rows.Count == 0)
                 {
@@ -78,7 +78,7 @@ namespace PICancel.Conn
                 SQL = "exec [TRPICancel].[dbo].[sprzGETPIMenu] '" + OPType + "';";
 
 
-                ds = objRun.GetDataSet(SQL, conTRPI);
+                ds = objRun.GetDataSet(SQL, conTRPICancel);
                 OPDetail.strResult = "true";
                 OPDetail.strErrMsg = "OK";
                 if (ds.Tables.Count != 0)
@@ -1405,6 +1405,233 @@ namespace PICancel.Conn
         }
 
         #endregion
+
+        #region ProductPlanUpdate
+
+        public DataTable GetTypeCode()
+        {
+            string SQL = "";
+            try
+            {
+                SQL = "SELECT [TypeCode] ,[Name] FROM [TRPICancel].[dbo].[ProductPlanMaster]  group by  [TypeCode] ,[Name]";
+                dt = objRun.GetDatatables(SQL, conTRPICancel); 
+                return dt; 
+            }
+            catch (Exception e)
+            {
+                string ErrMgs; 
+                ErrMgs = e.Message; 
+            } 
+            return dt;
+        }
+        public DataTable GetProductPlanType(string TypeCode)
+        {
+            string SQL = "";
+            try
+            {
+                SQL = @"SELECT top 1  Type From ProductPlanMaster where TypeCode = '"+ TypeCode + "'";
+
+                dt = objRun.GetDatatables(SQL, conTRPICancel);
+                return dt;
+            }
+            catch (Exception e)
+            {
+                string ErrMgs;
+                ErrMgs = e.Message;
+            }
+            return dt;
+        }
+
+
+        public string ProductPlanUpdate(List<ProductPlan> data)
+        {
+             
+            string SQL = "";
+            
+            string strMgs;
+            try
+            {
+                string strQuey ="OK";
+
+                foreach (ProductPlan item in data)
+                {
+
+                    SQL = "sprProductPlanUpdate '"
+                       + Convert.ToDateTime(item.InputDate).ToString("yyyyMMdd") + "','"
+                       + item.Type + "','"
+                       + item.TypeCode + "','"
+                       + item.DeliveryPlanQty + "','"
+                       + item.UserName + "';";
+
+                    SQL += " exec sprProductPlanMake; ";
+
+                    dt = objRun.GetDatatables(SQL, conTRPICancel);
+
+
+                    if( dt.Rows[0][0].ToString() != "0" || dt.Rows.Count == 0)
+                    {
+                        strQuey = "Errors : "+ SQL +": MSG:"+ dt.Rows[0][0].ToString();
+                        break; 
+                    } 
+                }
+
+                strMgs = strQuey; 
+
+            }
+            catch (Exception e)
+            {
+
+                strMgs = e.Message;
+            }
+
+             
+
+            return strMgs;
+
+
+
+        }
+
+      
+
+
+
+        #endregion
+
+
+
+
+
+        #region OrderInquiry
+
+        public OrderPlanInqGrp GetOrderPlanSummary(OrderPlanControl dataArr)
+        {
+            string SQL = "";
+            int Chkint = 0;
+            OrderPlanInqGrp grpListDataDetail = new OrderPlanInqGrp();
+            //List<RohmOrderError> OrderErrorList = new List<RohmOrderError>();
+            List<OrderPlanSummary> OrderNoChipList = new List<OrderPlanSummary>();
+            try
+            {
+
+                //dt = objRun.GetDatatables(getRohmInquiryString(dataArr), conTRPICancel); 
+                dt = GetdtOrderPlanList(dataArr);
+                if (dt.Rows.Count != 0)
+                {
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        OrderNoChipList.Add(new OrderPlanSummary()
+                        {
+                            InputDate = row["InputDate"].ToString().Trim(),
+                            TypeGroup = row["TypeGroup"].ToString().Trim(),
+                            Seq = row["Seq"].ToString().Trim(),
+                            TypeCode = row["TypeCode"].ToString().Trim(),
+                            Type = row["Type"].ToString().Trim(),
+                            Name = row["Name"].ToString().Trim(),
+                            DeliveryPlanQty = row["DeliveryPlanQty"].ToString().Trim(),
+                            OrderPlanQty = row["OrderPlanQty"].ToString().Trim(),
+                            DifQty = row["DifQty"].ToString().Trim(),
+
+                        });
+                    }
+                }
+                if (OrderNoChipList.Count() != 0)
+                {
+                    grpListDataDetail.strresult = "OK";
+                    grpListDataDetail.blStatus = true;
+                    grpListDataDetail.DataList = OrderNoChipList.ToList();
+                }
+                else
+                {
+                    grpListDataDetail.strresult = "Data not found";
+                    grpListDataDetail.blStatus = false;
+                    grpListDataDetail.DataList = null;
+                }
+            }
+            catch (Exception e)
+            {
+                grpListDataDetail.strresult = e.Message;
+                grpListDataDetail.blStatus = false;
+                grpListDataDetail.DataList = null;
+            }
+
+            return grpListDataDetail;
+        }
+
+
+        public DataTable GetdtOrderPlanList(OrderPlanControl dataArr)
+        {
+            dt = new DataTable();
+            string SQL = "sprProductPlanMake ; ";
+            int i = 0;
+            SQL = "SELECT TOP (1000) 	  convert(varchar, [InputDate], 106) as InputDate      ,[TypeGroup]      ,[Seq]      ,[TypeCode]      ,[Type]      ,[Name]      ,[DeliveryPlanQty]      ,[OrderPlanQty]      ,[DifQty]  FROM [TRPICancel].[dbo].[vewOrderPlanSummary] ";
+            if (dataArr.InputDateForm != null)
+            {
+                SQL += i == 0 ? " WHERE " : " And ";
+                SQL += " InputDate >='" + Convert.ToDateTime(dataArr.InputDateForm).ToString("yyyyMMdd") + "' ";
+                i++;
+            };
+            if (dataArr.InputDateTo != null)
+            {
+                SQL += i == 0 ? " WHERE " : " And ";
+                SQL += " InputDate <='" +  Convert.ToDateTime(dataArr.InputDateTo).ToString("yyyyMMdd") + "' ";
+                i++;
+            };
+            if (dataArr.TypeCode != null)
+            {
+                SQL += i == 0 ? " WHERE " : " And ";
+                SQL += " Type ='" + dataArr.TypeCode + "' ";
+                i++;
+            };
+
+
+            dt = objRun.GetDatatables(SQL,conTRPICancel);
+             
+
+            return dt;
+
+        }
+
+
+        public List<OrderPlanDetail> GetdtOrderPlanDetail(string InputDate, string strTypeCode)
+        {
+
+            List<OrderPlanDetail> OrderNoChipList = new List<OrderPlanDetail>();
+            dt = new DataTable();
+            string SQL = "";
+            int i = 0;
+            SQL = "SELECT [OrderNo],[TypeCode],[InputDate],[OrderQty],[RohmProductCode],[ProductCode],[TRNo],[Type],[SLine],[UpdDate]FROM[TRPICancel].[dbo].[vewOrderPlanDetail]";
+            SQL += "WHERE [TypeCode]='" + strTypeCode + "' AND [InputDate] ='" + Convert.ToDateTime(InputDate).ToString("yyyyMMdd") + "'";
+
+            dt = objRun.GetDatatables(SQL, conTRPICancel);
+
+            foreach (DataRow row in dt.Rows)
+            {
+                OrderNoChipList.Add(new OrderPlanDetail()
+                {
+                    OrderNo = row["OrderNo"].ToString().Trim(),
+                    TypeCode = row["TypeCode"].ToString().Trim(),
+                    InputDate = row["InputDate"].ToString().Trim(),
+                    OrderQty = row["OrderQty"].ToString().Trim(),
+                    RohmProductCode = row["RohmProductCode"].ToString().Trim(),
+                    ProductCode = row["ProductCode"].ToString().Trim(),
+                    TRNo = row["TRNo"].ToString().Trim(),
+                    Type = row["Type"].ToString().Trim(),
+                    SLine = row["SLine"].ToString().Trim(), 
+                });
+            }
+
+
+
+            return OrderNoChipList;
+
+        }
+
+        #endregion
+
+
+
 
 
         #endregion

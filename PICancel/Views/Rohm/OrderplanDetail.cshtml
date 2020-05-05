@@ -1,0 +1,217 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutPageNobar.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class=" col-lg">
+            <div class="table-responsive-lg text-center">
+                <table id="tbNoChip" class="table table-bordered table-striped table-sm nowrap w-100  ">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>OrderNo</th>
+                            <th>TypeCode</th>
+                            <th>InputDate</th>
+                            <th>OrderQty</th>
+                            <th>RohmProductCode</th>
+                            <th>ProductCode</th>
+                            <th>TRNo</th>
+                            <th>Type</th>
+                            <th>SLine</th>
+                            <th>Msg</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Select</th>
+                            <th>OrderNo</th>
+                            <th>TypeCode</th>
+                            <th>InputDate</th>
+                            <th>OrderQty</th>
+                            <th>RohmProductCode</th>
+                            <th>ProductCode</th>
+                            <th>TRNo</th>
+                            <th>Type</th>
+                            <th>SLine</th>
+                            <th>Msg</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts    {
+<script>
+        $(document).ready(function () {
+            GetDefault();
+            var strEvent = '@ViewBag.Event';
+            sessionStorage.setItem("ssEvent", strEvent);
+            var strWKstatus = '@ViewBag.WKstatus';
+            sessionStorage.setItem("ssWKstatus", strWKstatus);
+        });
+        onReady(function () {
+            $(".se-pre-con").fadeOut("slow");
+            return false;
+        });
+        function onReady(callback) {
+            var intervalId = window.setInterval(function () {
+                if (document.getElementsByTagName('body')[0] !== undefined) {
+                    window.clearInterval(intervalId);
+                    callback.call(this);
+                }
+            }, 1000);
+        };
+        function GetDefault() {
+            myDataPicker = $('.datepikers').datepicker({
+                language: 'en',
+                dateFormat: 'dd M yyyy',
+                minView: 'days',
+                view: 'days',
+                //maxDate: new Date()
+            }).data('datepicker');
+            //getinitials();
+            GetdataTables();
+            //GetdataTables1();
+            // GetTypeCode("@Url.Action("GetTypeCode", "Rohm")");
+        }
+
+        $("#btnClear").on("click", function () {
+            myFunction();
+        });
+
+
+
+        var myTables;
+        var ItemCode = [];
+        var DocNo;
+    function GetdataTables() {
+
+        // #region GetDataTable
+        debugger
+        myTables = $('#tbNoChip').DataTable({
+            paging: false,
+            processing: true,
+            deferRender: true,
+            ordering: false,
+            //dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            //dom: '<"top"B>rt<"bottom"ip><"clear">',//มี Buttons ,ไม่มีแบ่งpage บนหัว Table
+            columns: [
+                {
+                    targets: 0,
+
+                    data: '',
+                    defaultContent: '',
+                    orderable: false,
+                    className: 'select-checkbox'
+                },
+                { data: 'OrderNo' },
+                { data: 'TypeCode' },
+                { data: 'InputDate' },
+                { data: 'OrderQty' },
+                { data: 'RohmProductCode' },
+                { data: 'ProductCode' },
+                { data: 'TRNo' },
+                { data: 'Type' },
+                { data: 'SLine' },
+                {
+                    data: null,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        var OrderNo = oData.OrderNo;
+                        $(nTd).html("<input   id='" + OrderNo + "' name='" + OrderNo + "' class='allowNumOnly form-control form-control-sm allownumericwithdecimal' type='number' value='' />");
+                    }
+                },
+            ],
+            buttons: [
+                {
+                    text: 'Select all',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().select();
+                    }
+                },
+                {
+                    text: 'Select none',
+                    className: '  Button btn btn-outline-info btn-sm',
+                    action: function () {
+                        myTables.rows().deselect();
+                    }
+                }
+            ],
+            columnDefs: [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            select: {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                GetDatadetails();
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+
+
+
+        function GetDatadetails() {
+            debugger
+            $.ajax({
+            type: 'POST',
+                url: '@Url.Action("GetOrderdetails", "Rohm")',
+                data: { strInputDate: "@ViewBag.strInputDate", strTypeCode: "@ViewBag.strTypeCode" },
+            dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+                        myTables.rows.add(Data.data).draw();
+                        $("#txtDocNo1").val(Data.DocNo);
+                        $("#txtDocNo2").val(Data.RunNo);
+                    }
+                        else
+                            if (Data.strboolbel == false && Data.strResult == "Error") {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: "ERROR",
+                                    text: Data.dataLabel,
+                                    type: 'error',
+                                })
+
+                                return false;
+                            }
+                            else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Warning",
+                                    text: Data.dataLabel,
+                                    type: 'warning',
+                                });
+                                $("#txtDocNo1").val("")
+                                $("#txtDocNo2").val("")
+                            }
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                }
+            });
+
+
+ 
+        }
+        // #endregion
+
+
+
+    }
+
+</script>
+
+}

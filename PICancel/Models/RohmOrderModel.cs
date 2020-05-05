@@ -95,4 +95,59 @@ namespace PICancel.Models
     }
 
 
+
+    public class ProductPlan
+    {
+        public string Type { get; set; }
+        public string TypeCode { get; set; }
+        public int DeliveryPlanQty { get; set; }
+        public string InputDate { get; set; }
+        public string UserName { get; set; }
+    }
+
+
+    public class OrderPlanSummary
+    {
+        public string InputDate { get; set; }
+        public string TypeGroup { get; set; }
+        public string Seq { get; set; }
+        public string TypeCode { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string DeliveryPlanQty { get; set; }
+        public string OrderPlanQty { get; set; }
+        public string DifQty { get; set; }
+    }
+
+    public class OrderPlanControl
+    {
+        public string InputDateForm { get; set; }
+        public string InputDateTo { get; set; }
+        public string TypeCode { get; set; } 
+    }
+    public class OrderPlanInqGrp
+    {
+        public Boolean blStatus { get; set; }
+        public string strresult { get; set; }
+        public List<OrderPlanSummary> DataList { get; set; }
+    }
+
+    public class OrderPlanDetail
+    {
+        public string OrderNo { get; set; }
+        public string TypeCode { get; set; }
+        public string InputDate { get; set; }
+        public string OrderQty { get; set; }
+        public string RohmProductCode { get; set; }
+        public string ProductCode { get; set; }
+        public string TRNo { get; set; }
+        public string Type { get; set; }
+        public string SLine { get; set; } 
+    }
+    public class OrderPlanDetailGrp
+    {
+        public Boolean blStatus { get; set; }
+        public string strresult { get; set; }
+        public List<OrderPlanSummary> DataList { get; set; }
+    }
 }

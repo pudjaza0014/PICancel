@@ -1,0 +1,160 @@
+﻿<div>
+    <div class="row mt-4">
+        <div class="col-lg-3 ml-4">
+            <label for="txtInputDate" class="font-weight-bold">Input Date form.</label>
+            @Html.TextBox("txtInputDateInq", "", new { @class = "form-control form-control-sm datepikers", @id = "txtInputDateInq", @placeholder = "Click for choose From Date.", @type = "text" })
+        </div>
+        <div class="col-lg-3">
+            <label for="txtInputDate" class="font-weight-bold">Input Date To.</label>
+            @Html.TextBox("txtInputDateToInq", "", new { @class = "form-control form-control-sm datepikers", @id = "txtInputDateToInq", @placeholder = "Click for choose To Date.", @type = "text" })
+        </div>
+        <div class="col-lg-3">
+            <label for="ddlTypeCode" class="font-weight-bold">TypeCode.</label>
+            @Html.DropDownList("ddlTypeCodeInq", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlTypeCodeInq", @class = " form-control form-control-sm clTypeCode", width = "300px" })
+        </div>
+     
+    </div>
+    <div class="form-row  mt-4">
+        <div class=" col-lg">
+            <div class="btn-group form-inline ml-4" role="group" aria-label="Basic example">
+                <buton class="btn btn-info " style="min-width:10vw" id="btnSearch_Inquirys"><i class="fas fa-search"></i> Search</buton>
+                <buton class="btn btn-secondary" id="btnClear"><i class="fas fa-sync"></i> Clear</buton>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table id="tbPDPInq" class="table table-bordered table-striped table-sm nowrap">
+        <thead>
+            <tr class="bg-info">
+                <th>InputDate</th>
+                <th>TypeGroup</th>
+                <th>Seq</th>
+                <th>TypeCode</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>DeliveryPlanQty</th>
+                <th>OrderPlanQty</th>
+                <th>DifQty</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr>
+                <th>InputDate</th>
+                <th>TypeGroup</th>
+                <th>Seq</th>
+                <th>TypeCode</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>DeliveryPlanQty</th>
+                <th>OrderPlanQty</th>
+                <th>DifQty</th>
+                <th>Detail</th>
+            </tr>
+        </tfoot>
+    </table>
+</div> 
+
+<script>
+    var myTables1;
+    var ItemCode = [];
+    var DocNo;
+
+    function GetdataTables1() { 
+        myTables1 = $('#tbPDPInq').DataTable({
+            paging: true,
+            ordering: false,
+            processing: true,
+            deferRender: true,
+            dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            //dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            //dom: '<"top"B>rt<"bottom"ip><"clear">',//มี Buttons ,ไม่มีแบ่งpage บนหัว Table
+            columns: [
+                { data: 'InputDate' },
+                { data: 'TypeGroup' },
+                { data: 'Seq' },
+                { data: 'TypeCode' },
+                { data: 'Type' },
+                { data: 'Name' },
+                { data: 'DeliveryPlanQty' },
+                { data: 'OrderPlanQty' },
+                { data: 'DifQty' },
+                {
+                    data: null,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        var InputDate = oData.InputDate;
+                        var TypeCode = oData.TypeCode; 
+
+                        var sdf = String( "/Rohm/OrderplanDetail?strInputDate=" + encodeURIComponent(InputDate) + "&strTypeCode=" + TypeCode + " ");
+                         
+                        //$(nTd).html("<a class='btn btn-info' href='@Url.Action("OrderplanDetail", "Rohm")?strInputDate=" + InputDate + "&strTypeCode=" + TypeCode + " '  target='_blank' > Click</a>");
+                        // $(nTd).html("<a class='btn btn-info' href='@Url.Action("OrderplanDetail", "Rohm")?strInputDate=" + InputDate + "&strTypeCode=" + TypeCode + " '  target='_blank' > Click</a>");
+                        if (oData.Seq != "99") {
+                            $(nTd).html("<button class='btn btn-info btn-sm btn-block' onclick=GetOrderPlanDetail('" + encodeURIComponent(InputDate) + "','" + TypeCode + "') > Click</button>");
+                        } else {
+                            $(nTd).html(""); 
+                        }
+
+                    }
+                },
+
+            ], 
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+
+        $("#btnSearch_Inquirys").on("click", function () {
+
+            var strControl = [{
+                InputDateForm: $("#txtInputDateInq").val(),
+                InputDateTo: $("#txtInputDateToInq").val(),
+                TypeCode: $("#ddlTypeCodeInq").val()
+            }];
+
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("getOrderPlanInquiry", "Rohm")",
+                data: { ArrData: strControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+                    myTables1.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                        myTables1.rows.add(Data.data).draw();
+
+                        $("#txtInputDateInq").val("");
+                        $("#txtInputDateToInq").val("");
+                        $("#ddlTypeCodeInq").val("");
+                    };
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                },
+            });
+            return 
+        });
+
+
+        
+
+    }
+    function GetOrderPlanDetail(strInputdate, strTypeCode) { 
+        debugger
+        var width = parseInt(screen.availWidth/1.2);
+        var height = parseInt(screen.availHeight / 1.2);
+            var left = parseInt((screen.availWidth / 2) - (width / 2));
+            var top = parseInt((screen.availHeight / 2) - (height / 2));
+        var windowFeatures = "width=" + width + ",height=" + height + ",left=" + left + ",top="+top
+                ",status,resizable " +
+                ",scrollbars=yes"; 
+        var myWindow = window.open('@Url.Action("OrderplanDetail", "Rohm")?strInputDate=' + decodeURIComponent(strInputdate) + '&strTypeCode=' + strTypeCode+'', "subWind", windowFeatures, "POS");
+        //var myWindow = window.open(url, "subWind", windowFeatures, "POS");
+
+    }
+    </script>

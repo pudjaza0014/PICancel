@@ -1,35 +1,28 @@
-﻿@{
+﻿
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @{
-    if (@ViewBag.Event == "OrderError" || @ViewBag.Event == "NoChip")
-    {
-        Html.RenderPartial("_partialRohm/_PartReturnOrderError");
-    }
-    else if (@ViewBag.Event == "Inquiry")
-    {
-        Html.RenderPartial("_partialRohm/_PartReturnOrderInquiry");
-    }
-
+    // product plan Maintenance
+    ViewBag.Title = "PRODUCT PLAN MAINTENANCE";
+    Html.RenderPartial("_partialRohm/ProductPlan/PlanMaintenance");
 }
 
-@section Scripts    {
-    <script>
-        var myDataPicker;
 
-         $(document).ready(function (){
+@section Scripts    {
+    <script src="~/Class/PiScript.js"></script>
+    <script>
+        $(document).ready(function () {
             GetDefault();
             var strEvent = '@ViewBag.Event';
             sessionStorage.setItem("ssEvent", strEvent);
-              var strWKstatus = '@ViewBag.WKstatus';
+            var strWKstatus = '@ViewBag.WKstatus';
             sessionStorage.setItem("ssWKstatus", strWKstatus);
         });
-
         onReady(function () {
             $(".se-pre-con").fadeOut("slow");
             return false;
         });
-
         function onReady(callback) {
             var intervalId = window.setInterval(function () {
                 if (document.getElementsByTagName('body')[0] !== undefined) {
@@ -38,33 +31,22 @@
                 }
             }, 1000);
         };
-         
         function GetDefault() {
             myDataPicker = $('.datepikers').datepicker({
                 language: 'en',
                 dateFormat: 'dd M yyyy',
                 minView: 'days',
                 view: 'days',
-                maxDate: new Date()
+                //maxDate: new Date()
             }).data('datepicker');
-
-            if ("@ViewBag.Event" != "NoChip") { 
-                $("#divLink").css("display", "none");
-            } 
-            if ("@ViewBag.Event" != "Inquiry") { 
-                GetCancelOperator();
-
-            } 
-            if ("@ViewBag.Event" == "Inquiry") { 
-                GetCategType(); 
-                GetRohmIquiryType();
-            } 
+            getinitials();
             GetdataTables();
-        } 
+            GetdataTables1();
+             GetTypeCode("@Url.Action("GetTypeCode", "Rohm")");
+        }
+
         $("#btnClear").on("click", function () {
             myFunction();
         });
-         
-
     </script>
 }

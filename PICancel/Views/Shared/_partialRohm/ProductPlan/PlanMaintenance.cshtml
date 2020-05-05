@@ -1,0 +1,61 @@
+﻿<div class="container-fluid">
+    <div> 
+        <div class=" ">
+            <div class="card">
+                @*<div class="card-header bg-white">
+                  
+                </div>*@
+                
+                <div class="card-body" style="width:100%;">
+                    <ul class="nav nav-tabs mb-4" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link " id="btnPdSet" href="#profile" role="tab" data-toggle="tab">Product Plan Maintenance.</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#OrderPlanUpload" role="tab" data-toggle="tab">Product Plan Upload Excel file.</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#references" role="tab" data-toggle="tab">Product Plan Inquiry.</a>
+                        </li>
+                    </ul> 
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="profile">
+                           
+
+                          @{ 
+                              Html.RenderPartial("_partialRohm/ProductPlan/_PartPlanMaintenance");
+                          }
+
+                        </div> 
+
+                        <div role="tabpanel" class="tab-pane fade" id="OrderPlanUpload">
+
+                            @{
+                                Html.RenderPartial("_partialRohm/ProductPlan/_PartPlanUploadfile");
+                            }
+
+
+                        </div>
+
+
+
+                        <div role="tabpanel" class="tab-pane fade" id="references">
+                            @{
+                                Html.RenderPartial("_partialRohm/ProductPlan/_PartPlanInquiry");
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+
+<script>
+    function getinitials(){
+        $("#btnPdSet").click();
+        readie();
+    }
+</script>

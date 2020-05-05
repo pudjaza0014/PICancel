@@ -1,0 +1,241 @@
+﻿<div>
+    <div class="row mt-4 ml-4">
+        <div class="col-lg-3">
+            <label for="txtInputDate" class="font-weight-bold">Input Date.</label>
+            @Html.TextBox("txtInputDate", "", new { @class = "form-control form-control-sm datepikers", @id = "txtInputDate", @placeholder = "Click for choose Date.", @type = "text" })
+        </div> 
+        <div class="col-lg-3">
+            <label for="ddlTypeCode" class="font-weight-bold">TypeCode.</label>
+            @Html.DropDownList("ddlTypeCode", new MultiSelectList(string.Empty, "Value", "Text"), new { @id = "ddlTypeCode", @class = " form-control form-control-sm clTypeCode", width = "300px" })
+        </div>
+        <div class="col-lg-3">
+            <label for="txtPlanQty" class="font-weight-bold">DeliveryPlanQty.</label>
+            @Html.TextBox("txtPlanQty", "", new { @class = "form-control form-control-sm", @id = "txtPlanQty", @placeholder = "Click for choose Date.", @type = "number" })
+        </div>
+    </div>
+    <div class="form-row  mt-4">
+        <div class=" col-lg">
+            <div class="btn-group form-inline ml-4">
+                <buton class="btn btn-info " style="min-width:10vw" id="btnSearch_ProdPlan"><i class="fas fa-plus"></i> Add</buton>
+                <buton class="btn btn-secondary" id="btnProdTempClear"><i class="fas fa-sync"></i> Clear</buton>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="text-center">
+        <span class=""> - The table for the product plan is ready to be update. - </span>
+    </div>
+    <div class="table-responsive text-center  ">
+        <table id="tbPDPlan" class="table table-bordered table-striped table-sm nowrap">
+            <thead>
+                <tr>
+                    <th>Input Date.</th>
+                    <th>Type</th>
+                    <th>TypeCode</th>
+                    <th>DeliveryPlanQty</th> 
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    <th>Input Date.</th>
+                    <th>Type</th>
+                    <th>TypeCode</th>
+                    <th>DeliveryPlanQty</th> 
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="form-row  mt-4 ml-4">
+        <div class=" col-lg">
+            <div class="form-group form-inline ">
+                <button class="btn btn-success" style="min-width:10vw" id="btnProdPlanEntrys"><i class="fas fa-plus"></i> Update Product Plan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var myTables;
+    var ItemCode = [];
+    var DocNo;
+
+    function GetdataTables() {
+        myTables = $('#tbPDPlan').DataTable({
+            paging: false,
+            processing: true,
+            deferRender: true,
+            dom: '<"top"l>rt<"bottom"ip><"clear">', //ไม่มี Buttons บนหัว Table
+            //dom: '<"top"lB>rt<"bottom"ip><"clear">',//มี Buttons บนหัว Table
+            //dom: '<"top"B>rt<"bottom"ip><"clear">',//มี Buttons ,ไม่มีแบ่งpage บนหัว Table
+            columns: [
+                { data: 'InputDate' },
+                { data: 'Type' },
+                { data: 'TypeCode' },
+                { data: 'DeliveryPlanQty' },
+            ],
+            order: [1, "asc"],
+            fnInitComplete: function (oSettings, json, sData) {
+                $(".se-pre-conF").fadeOut("slow");
+                return;
+            },
+        });
+       
+
+
+
+        $("#btnSearch_ProdPlan").on("click", function () {
+            gettempdata(myTables, "@Url.Action("AddTempTable", "Rohm")");
+        });
+        $("#ddlTypeCode").on("change", function () {
+            $("#txtPlanQty").focus();
+        });
+
+        $("#btnProdTempClear").on("click", function () {
+            ClearControl();
+        });
+
+        function ClearControl() {
+
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("ProdmainClearTemp", "Rohm")",
+                //data: { ArrData: strControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+                   
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+                        myTables.clear().draw();
+                        $("#ddlTypeCode").val("");
+                        $("#txtPlanQty").val("");
+                        $("#txtInputDate").val("");
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Clear data Success', 
+                            type: 'success',
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: Data.dataLabel,
+                            type: 'error',
+                        }).then(function () {
+                            return false;
+                        });
+                    }
+                },
+                error: function (ex) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to retrieve states.' + ex.message,
+                        type: 'error',
+                    });
+                },
+            });
+        }
+
+        $("#btnProdPlanEntrys").on("click", function () {
+            if (myTables.rows().count() == 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Warning",
+                    text: "Data not found",
+                    type: 'warning',
+                })
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("ProductplanEntry", "Rohm")",
+                //data: { ArrData: strControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                        //myTables.rows.add(Data.data).draw();
+
+                        $("#ddlTypeCode").val("");
+                        $("#txtPlanQty").val("");
+                        $("#txtInputDate").val("");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Update Successful.',
+                            type: 'success',
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: Data.dataLabel,
+                            type: 'error',
+                        }).then( function() {
+                            return false;
+                        });
+                    }
+                },
+                error: function (ex) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to retrieve states.' + ex.message,
+                        type: 'error',
+                    });
+                },
+            });
+        });
+
+        function gettempdata(myTables, GetDataurl) {
+
+            if ($("#ddlTypeCode").val() == "" || $("#txtPlanQty").val() == "" || $("#txtInputDate").val() == "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Please fill out all information.',
+                    type: 'warning',
+                }); 
+                return false;
+            } 
+            var strControl = [];
+            strControl = [{
+                Type: "",
+                TypeCode: $("#ddlTypeCode").val(),
+                DeliveryPlanQty: $("#txtPlanQty").val(),
+                InputDate: $("#txtInputDate").val(),
+                UserName: ""
+            }];
+
+            $.ajax({
+                type: 'POST',
+                url: GetDataurl,
+                data: { ArrData: strControl[0] },
+                dataType: 'json',
+                success: function (Data) {
+                    myTables.clear().draw();
+                    if (Data.strboolbel == true && Data.strResult == "OK") {
+
+                        myTables.rows.add(Data.data).draw();
+
+                        $("#ddlTypeCode").val("");
+                        $("#txtPlanQty").val("");
+                        $("#txtInputDate").val("");
+                    };
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve states.' + ex);
+                },
+            });
+            return
+        };
+
+
+    };
+</script>

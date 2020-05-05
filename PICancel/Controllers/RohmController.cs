@@ -10,6 +10,8 @@ using System.IO;
 using System.Configuration;
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
+using System.Web;
+using System.Collections;
 
 namespace PICancel.Controllers
 {
@@ -587,6 +589,413 @@ namespace PICancel.Controllers
 
         #endregion
 
+        #region Product plan Maintenance
 
+        public ActionResult ProductPlan(string Event)
+        {
+            Session["model"] = null;
+            ViewBag.USERNAME = Session["USERNAME"];
+            if (Session["OPID"] == null)
+            {
+                return View("~/Views/Home/Login.cshtml");
+            }
+            else if (Event != "" && Event != null)
+            {
+                string TitleEvent = "";
+                string _WKstatus = "";
+
+                string AuthorityLV = Session["AuthorityLV"] as string;
+
+                ViewBag.Title = TitleEvent;
+                ViewBag.Event = Event;
+                ViewBag.WKstatus = _WKstatus;
+                ViewBag.AuthorityLV = AuthorityLV;
+                return View();
+            }
+            else
+            {
+                return View("~/Views/Home/Login.cshtml");
+            }
+
+        }
+
+        public JsonResult GetTypeCode()
+        {
+
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            dt = new DataTable();
+            dt = objrun.GetTypeCode();
+            if (dt.Rows.Count != 0)
+            {
+                listItems.Add(new SelectListItem()
+                {
+                    Text = "All",
+                    Value = ""
+                });
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    listItems.Add(new SelectListItem()
+                    {
+                        Text = row["TypeCode"].ToString().Trim() + " : " + row["Name"].ToString().Trim(),
+                        Value = row["TypeCode"].ToString().Trim(),
+
+                    });
+                }
+            }
+            return Json(new MultiSelectList(listItems, "Value", "Text"));
+        }
+
+        public JsonResult AddTempTable(ProductPlan ArrData)
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+            DataSet dsCancel = new DataSet();
+            DataTable dtCancel = new DataTable();
+            //List<ProductPlan> dtTemp = new List<ProductPlan>();
+
+            List<ProductPlan> dtTemp2 = Session["model"] as List<ProductPlan>;
+            if (dtTemp2 == null)
+            {
+                dtTemp2 = new List<ProductPlan>();
+            }
+
+            dt = new DataTable();
+            dt = objrun.GetProductPlanType(ArrData.TypeCode);
+
+
+            dtTemp2.Add(new ProductPlan() {
+                InputDate = ArrData.InputDate,
+                Type = dt.Rows.Count != 0 ? dt.Rows[0]["Type"].ToString() : "" ,
+                TypeCode= ArrData.TypeCode,
+                DeliveryPlanQty = Convert.ToInt32(ArrData.DeliveryPlanQty),
+                UserName = Session["OPID"] as string 
+            });
+
+            Session["model"] = dtTemp2;
+
+            _DataResult = "";
+
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = dtTemp2 }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+
+        public ActionResult UploadExcel()
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true; 
+            HttpPostedFileBase file = Request.Files[0]; 
+            HttpPostedFileBase strReturn = Request.Files["FileUpload1"];
+            DataTable dt;
+            DataSet ds;
+            //bool flag = true;
+            //string responseMessage = string.Empty;
+            string Results = "";
+            try
+            {
+                if (file != null && file.ContentLength > 0  )
+                //if (file != null && file.ContentLength > 0 && (Path.GetExtension(file.FileName).ToLower() == ".csv"))
+                {
+                    try
+                    {
+                        string extension = System.IO.Path.GetExtension(Request.Files["FileUpload1"].FileName).ToLower();
+                        string query = null;
+                        string connString = "";
+                        string fileName = Path.GetFileName(file.FileName);
+                        string filePath = Path.Combine(Server.MapPath("~/Content/Uploads"), fileName);
+                        string[] arrResult; 
+                        if (System.IO.File.Exists(filePath)) {
+                            System.IO.File.Delete(filePath);
+                        }; 
+                        file.SaveAs(filePath);
+                        //SautinSoft.UseOffice u = new SautinSoft.UseOffice();
+
+                        //string inpFile = Path.GetFullPath(filePath);
+                        //string outFile = Path.GetFullPath(filePath.Replace("xlsx","csv"));
+
+                        //int ret = u.InitExcel();
+                        //if (ret == 1)
+                        //{
+
+                        //    Console.WriteLine("Error! Can't load MS Excel library in memory");
+                            
+                        //}
+
+                        //ret = u.ConvertFile(inpFile, outFile, SautinSoft.UseOffice.eDirection.XLSX_to_CSV);
+
+                        //filePath = filePath.Replace("xlsx", "csv");
+                        //extension = ".csv";
+                        //u.CloseExcel();
+
+                        //if (ret == 0)
+                        //{
+                        //    // Open the result.
+                        //   // System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(outFile) { UseShellExecute = true });
+                        //}
+
+
+                        _ResultLabel = true;
+
+                        if (extension == ".csv")
+                        {
+                            ds = Utility.ConvertCSVtoDataSet(filePath);
+                            //responseMessage = objrun.UpdTargetMCgroup(dt, "");
+                            //ViewBag.Data = dt;
+                            if (ds.Tables.Count > 0)
+                            {
+
+                                arrResult = dsProductplanEntry(ds);
+
+
+                                _DataResult = arrResult[0];
+                                Results = _DataResult;
+                                _ResultLabel = Convert.ToBoolean(arrResult[1]);
+                            }
+                            else
+                            {
+                                _DataResult = "datatable nothing ";
+                                if (System.IO.File.Exists(filePath))
+                                {
+                                    _DataResult += filePath;
+                                }
+                            }
+                        }
+                        else if (extension.Trim() == ".xls")
+                        {
+                            connString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + filePath + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
+                            dt = Utility.ConvertXSLXtoDataTable(filePath, connString);
+                            DataTable dtCopy = dt.Copy();
+                            //ViewBag.Data = dt;
+                            ds = new DataSet();
+                            ds.Tables.Add(dtCopy);
+                            // ViewBag.Data = dt;
+                            if (ds.Tables.Count > 0)
+                            {
+
+                                arrResult = dsProductplanEntry(ds);
+
+
+                                _DataResult = arrResult[0];
+                                Results = _DataResult;
+                                _ResultLabel = Convert.ToBoolean(arrResult[1]);
+                            }
+                            else
+                            {
+                                _DataResult = "datatable nothing ";
+                                if (System.IO.File.Exists(filePath))
+                                {
+                                    _DataResult += filePath;
+                                }
+                            }
+                        }
+                        else
+                        if (extension.Trim() == ".xlsx")
+                        {
+                            connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
+                            dt = Utility.ConvertXSLXtoDataTable(filePath, connString);
+                            DataTable dtCopy = dt.Copy();
+                            //ViewBag.Data = dt;
+                            ds = new DataSet();
+                            ds.Tables.Add(dtCopy);
+                            if (ds.Tables.Count > 0)
+                            { 
+                                arrResult = dsProductplanEntry(ds); 
+                                _DataResult = arrResult[0];
+                                Results = _DataResult;
+                                _ResultLabel = Convert.ToBoolean(arrResult[1]);
+                            }
+                            else
+                            {
+                                _DataResult = "datatable nothing ";
+                                if (System.IO.File.Exists(filePath))
+                                {
+                                    _DataResult += filePath;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _ResultLabel = false;
+                        _DataResult = "Upload Failed with error: " + ex.Message;
+                    }
+                }
+                else
+                {
+                    _ResultLabel = false;
+                    _DataResult = "Please Upload Files .csv format";
+                }
+            } 
+            catch (Exception e)
+            {
+                _Result = "ERROR";
+                _ResultLabel = false;
+                _DataResult = e.Message;
+            }
+            //return Json(new { data = responseMessage, flags = flag }, JsonRequestBehavior.AllowGet);
+
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = Results }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+
+        
+
+
+
+        public string[] dsProductplanEntry(DataSet ds)
+        {
+            string result;
+            string _Result = "1";
+            string _DataResult = "OK";
+            Boolean _ResultLabel = true;
+
+            string[] arrResult;
+            
+
+            List<ProductPlan> listItems = new List<ProductPlan>();
+            int chkCol = 0;
+            string strInputDate;
+            try
+            {
+                foreach (DataColumn i in ds.Tables[0].Columns)
+                {
+                    if (chkCol >= 2 && i.ColumnName.ToString() != "ProductPlanTemplate")
+                    { 
+                        strInputDate = i.ColumnName.ToString(); 
+                        foreach (DataRow row in ds.Tables[0].Rows)
+                        { 
+                            listItems.Add(new ProductPlan()
+                            {
+                                Type = row["Type"].ToString(),
+                                TypeCode = row["TypeCode"].ToString(),
+                                DeliveryPlanQty = Convert.ToInt32(row[strInputDate].ToString()),
+                                InputDate = strInputDate,
+                                UserName = Session["OPID"] as string
+                            });  
+                        }
+                    }
+                    chkCol++;
+                } 
+                _DataResult = objrun.ProductPlanUpdate(listItems); 
+                _Result = _DataResult == "OK" ? "1" : "0"; 
+            }
+            catch (Exception e)
+            {
+                _DataResult = e.Message;
+                _Result = "0";
+            } 
+            arrResult = new string[] { _DataResult, _Result }; 
+            return arrResult; 
+        }
+
+
+
+        public JsonResult ProductplanEntry()
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+
+            _DataResult = objrun.ProductPlanUpdate(Session["model"] as List<ProductPlan>);
+            _Result = _DataResult == "OK" ? "1" : "0";
+
+            if(_DataResult == "OK")
+            {
+
+                _Result = "OK";
+                Session["model"] = null;
+
+
+            }
+            else
+            {
+                _Result = "Error"; 
+            }
+
+
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = _DataResult }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+
+        }
+        public JsonResult ProdmainClearTemp()
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+
+            Session["model"] = null;
+            if (Session["model"] != null)
+            {
+                _ResultLabel = false;
+                _Result = "Error";
+            } 
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = _DataResult }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+
+        }
+
+
+        public JsonResult getOrderPlanInquiry(OrderPlanControl arrData)
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+            List<OrderPlanSummary> DataList = new List<OrderPlanSummary>();
+            OrderPlanInqGrp dtTemp = objrun.GetOrderPlanSummary(arrData);
+
+            DataList = dtTemp.DataList;
+            _DataResult = dtTemp.strresult;
+            _Result = dtTemp.blStatus == true ? "OK" : "Error";
+            _ResultLabel = dtTemp.blStatus = true;
+
+
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = DataList }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+
+        }
+
+
+
+        public ActionResult OrderplanDetail(string strInputDate, string strTypeCode)
+        {
+            ViewBag.USERNAME = Session["USERNAME"];
+
+            if (Session["OPID"] == null)
+            {
+
+                return View("~/Views/Home/Login.cshtml");
+            }
+            ViewBag.Title = "Order Plan Detail : " + strInputDate + " TypeCode : " + strTypeCode;
+
+            ViewBag.strInputDate = strInputDate;
+            ViewBag.strTypeCode = strTypeCode;
+
+            return View();
+        }
+
+        public JsonResult GetOrderdetails(string strInputDate, string strTypeCode)
+        {
+            string _Result = "OK";
+            string _DataResult = "";
+            Boolean _ResultLabel = true;
+            List<OrderPlanDetail> DataList = new List<OrderPlanDetail>();
+
+            DataList = objrun.GetdtOrderPlanDetail(strInputDate, strTypeCode);
+
+            ViewBag.DataList = DataList;
+
+            var jsonResult = Json(new { strResult = _Result, dataLabel = _DataResult, strboolbel = _ResultLabel, data = DataList }, JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+        }
+
+        #endregion
     }
 }

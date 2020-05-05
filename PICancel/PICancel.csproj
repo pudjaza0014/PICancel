@@ -78,6 +78,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="UseOffice">
+      <HintPath>C:\Users\008287\Downloads\useoffice_net\UseOffice .Net (5.0.1.29)\UseOffice.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web.Razor">
@@ -106,6 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Class\PiScript.js" />
     <Content Include="Content\bootstrap-datepicker.css" />
     <Content Include="Content\bootstrap-datepicker.min.css" />
     <Content Include="Content\bootstrap-datepicker.standalone.css" />
@@ -316,6 +320,7 @@
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\semanticui.scss" />
+    <Content Include="Doc\ProductPlan1.xls" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Report\RptOrderChang.rpt" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -2227,6 +2232,13 @@
     <Content Include="Views\Shared\_partialRohm\_PartTableOrderError.cshtml" />
     <Content Include="Views\Shared\_partialRohm\_PartTableOrderNoChip.cshtml" />
     <Content Include="Views\Shared\_partialRohm\_PartTableOrderInquiry.cshtml" />
+    <Content Include="Views\Rohm\ProductPlan.cshtml" />
+    <Content Include="Views\Shared\_partialRohm\ProductPlan\PlanMaintenance.cshtml" />
+    <Content Include="Views\Shared\_partialRohm\ProductPlan\_PartPlanMaintenance.cshtml" />
+    <Content Include="Views\Shared\_partialRohm\ProductPlan\_PartPlanInquiry.cshtml" />
+    <Content Include="Views\Shared\_partialRohm\ProductPlan\_PartPlanUploadfile.cshtml" />
+    <Content Include="Views\Rohm\OrderplanDetail.cshtml" />
+    <Content Include="Views\Shared\_LayoutPageNobar.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2236,6 +2248,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Uploads\" />
     <Folder Include="Views\Initial\" />
   </ItemGroup>
   <ItemGroup>

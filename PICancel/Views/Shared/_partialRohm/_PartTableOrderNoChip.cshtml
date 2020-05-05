@@ -1,7 +1,7 @@
 ﻿<div class="row">
     <div class=" col-lg">
-        <div class="table-responsive-lg text-center">
-            <table id="tbNoChip" class="table table-bordered table-striped table-sm nowrap w-100  ">
+        <div class="table-responsive-lg text-center w-100 scroll-box small">
+            <table id="tbNoChip" class="table table-bordered table-striped table-sm nowrap  ">
                 <thead>
                     <tr>
                         <th>Select box</th>
@@ -55,7 +55,7 @@
         // #region GetDataTable
 
         myTables = $('#tbNoChip').DataTable({
-            scrollY: "200px",
+            //scrollY: "200px",
             paging: false,
             processing: true,
             deferRender: true,
@@ -89,10 +89,16 @@
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                         var OrderQty = oData.OrderQty;
                         var OrderNo = oData.OrderNo;
-                        $(nTd).html("<input type='text' id='" + OrderNo + "' name='" + OrderNo +"' class='allowNumOnly form-control form-control-sm' value='" + OrderQty+"' />");
+                        $(nTd).html("<input   id='" + OrderNo + "' name='" + OrderNo + "' class='allowNumOnly form-control form-control-sm allownumericwithdecimal' type='number' value='" + OrderQty+"' />");
                     }
                 },
-                { data: 'Message' },
+                {
+                    data: 'Message',
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        var Message = oData.Message; 
+                        $(nTd).html("<span> " + Message.replace(";", "<br/>")+"</span> ");
+                    },
+                },
             ],
             buttons: [
                 {

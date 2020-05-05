@@ -5,7 +5,6 @@
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>@ViewBag.Title</title>
     <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -50,7 +49,7 @@
 
         .scroll-box {
             overflow-y: scroll;
-            height: 45vh;
+            height: 70vh;
         }
 
         .TextColorsBlue {
@@ -114,40 +113,24 @@
             background: url('../img/Preloader_8.gif') center no-repeat;
             background-color: white;
         }
+
+
+
+        /*.bg-Imge {
+            background: url('../img/260161.jpg');
+            background-repeat: no-repeat;
+            background-size: auto;
+        }*/
     </style>
 </head>
-<body id="page-top">
-    <div class="se-pre-con "></div>
-    <div class="se-pre-conF"></div>
+<body class="bg-Imge">
     @{
-        Html.RenderPartial("_partial/_partMenuControl");
+        Html.RenderPartial("_partial/_PartHeader");
     }
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            @{
-                Html.RenderPartial("_partial/_PartHeader");
-            }
-
-            <div class="container-fluid ">
-                @RenderBody()
-            </div>
-        </div>
-        <!-- End of Main Content -->
-        <!-- Footer -->
-        <footer class="sticky-footer  footerColor" style="background-color:#DEE4E9;">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Rohm Integrated Systems Thailand Co.,Ltd. 2019</span>
-                </div>
-            </div>
-        </footer>
-        <!-- End of Footer -->
+    <div class="container">
+        <!-- Outer Row -->
+        @RenderBody()
     </div>
-    </div>
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-    <!-- Bootstrap core JavaScript-->
     <script src="~/Theme/vendor/jquery/jquery.min.js"></script>
     <script src="~/Theme/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Core plugin JavaScript-->
@@ -205,148 +188,7 @@
             $("#lblDate").html();
             $("#lblcomputerName").html(sessionStorage.getItem("ssCOMPUTERNAME"));
             $("#lblOPID").html(sessionStorage.getItem("ssUSERNAME"));
-            GetMenuSide();
-            $(".allowNumOnly").on("keypress keyup blur", function (event) {
-                $(this).val($(this).val().replace(/[^\d].+/, ""));
-                if ((event.which < 48 || event.which > 57)) {
-                    event.preventDefault();
-                }
-            });
-
-            $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
-                //this.value = this.value.replace(/[^0-9\.]/g,'');
-                $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
-                if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
-                    event.preventDefault();
-                }
-            });
         });
-        $("#btnLogOut").on("click", function () {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Select ''Logout'' below if you are ready to end your current session.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Logout'
-            }).then(function (result) {
-                if (result.value) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '@Url.Action("GetLogOut","Home")',
-                        dataType: 'json',
-                        success: function (Data) {
-                           if (Data.strboolbel == true && Data.strResult == "OK") {
-                                sessionStorage.clear();
-
-                               window.open("@Url.Action("Login","Home")", '_blank');
-                                window.close();
-                          }else {
-                                $("#txtUserName").val("");
-                                $("#txtPassword").val("");
-
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: "Warning",
-                                    text: Data.dataLabel,
-                                    type: 'warning',
-                                }).then(function () {
-                                    $("#txtUserName").focus();
-                                    return ;
-                                    });
-                                }
-                        },
-                        error: function (ex) {
-                                alert('Failed to retrieve states.' + ex);
-                        }
-                    });
-
-
-
-
-
-                }
-            })
-
-
-
-
-        });
-
-
-        function clearSession(e) {
-            $.ajax({
-                        type: 'POST',
-                url: '@Url.Action("GetLogOut")',
-                data: { strStatus: e},
-                        dataType: 'json',
-                        success: function (Data) {
-                           if (Data.strboolbel == true && Data.strResult == "OK") {
-                               sessionStorage.clear();
-
-                                //window.close();
-                          }else {
-                                $("#txtUserName").val("");
-                                $("#txtPassword").val("");
-
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: "Warning",
-                                    text: Data.dataLabel,
-                                    type: 'warning',
-                                }).then(function () {
-                                    $("#txtUserName").focus();
-                                    return ;
-                                    });
-                                }
-                        },
-                        error: function (ex) {
-                                alert('Failed to retrieve states.' + ex);
-                        }
-                    });
-
-        }
-        function GetMenuSide() {
-            $.ajax({
-                        type: 'POST',
-                url: '@Url.Action("GetManuSide","initial",new { Event = "2" })',
-
-                        dataType: 'json',
-                        success: function (Data) {
-                            if (Data.strboolbel == true && Data.strResult == "OK") {
-
-                              // $("#testMenu").html(Data.data);
-
-                                $("#testMenu").html(Data.data[0]).text();
-                                //$("#testMenu1").html(Data.data[1]).text();
-
-
-                                $("#testMenu1").append(Data.data[1]);
-                          }else {
-
-
-
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: "Warning",
-                                    text: Data.dataLabel,
-                                    type: 'warning',
-                                }).then(function () {
-                                    $("#txtUserName").focus();
-                                    return ;
-                                    });
-                                }
-                        },
-                        error: function (ex) {
-                                alert('Failed to retrieve states.' + ex);
-                        }
-                    });
-
-        }
-        function DecodeHtml(str) {
-            return $('<div/>').html(str).text();
-        }
     </script>
 </body>
 </html>
