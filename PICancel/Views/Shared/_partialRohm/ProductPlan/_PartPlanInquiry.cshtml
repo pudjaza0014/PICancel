@@ -110,7 +110,7 @@
         });
 
         $("#btnSearch_Inquirys").on("click", function () {
-
+             
             var strControl = [{
                 InputDateForm: $("#txtInputDateInq").val(),
                 InputDateTo: $("#txtInputDateToInq").val(),
@@ -123,14 +123,23 @@
                 data: { ArrData: strControl[0] },
                 dataType: 'json',
                 success: function (Data) {
+                     
                     myTables1.clear().draw();
-                    if (Data.strboolbel == true && Data.strResult == "OK") {
-
-                        myTables1.rows.add(Data.data).draw();
-
+                    if (Data.strboolbel == true && Data.strResult == "OK") { 
+                        myTables1.rows.add(Data.data).draw(); 
                         $("#txtInputDateInq").val("");
                         $("#txtInputDateToInq").val("");
                         $("#ddlTypeCodeInq").val("");
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: Data.dataLabel,
+                            type: 'error',
+                            timer: 1700,
+                        }).then(function () {
+                            return false;
+                        });
+
                     };
                 },
                 error: function (ex) {

@@ -1565,7 +1565,7 @@ namespace PICancel.Conn
             dt = new DataTable();
             string SQL = "sprProductPlanMake ; ";
             int i = 0;
-            SQL = "SELECT TOP (1000) 	  convert(varchar, [InputDate], 106) as InputDate      ,[TypeGroup]      ,[Seq]      ,[TypeCode]      ,[Type]      ,[Name]      ,[DeliveryPlanQty]      ,[OrderPlanQty]      ,[DifQty]  FROM [TRPICancel].[dbo].[vewOrderPlanSummary] ";
+            SQL = "SELECT   convert(varchar, [InputDate], 106) as InputDate      ,[TypeGroup]      ,[Seq]      ,[TypeCode]      ,[Type]      ,[Name]      ,[DeliveryPlanQty]      ,[OrderPlanQty]      ,[DifQty]  FROM [TRPICancel].[dbo].[vewOrderPlanSummary] ";
             if (dataArr.InputDateForm != null)
             {
                 SQL += i == 0 ? " WHERE " : " And ";
